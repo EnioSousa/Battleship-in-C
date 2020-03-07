@@ -1,4 +1,5 @@
 #include <string.h>
+#include "QuadTree.h"
 
 /* Numero de navios diferentes */
 #define NumDifShip 5
@@ -7,14 +8,19 @@
 /* Name -> nome do navio
    Size -> tamanho que o navio ocupa
    Num -> numero de navios a serem colocados
-   Left -> numero de navios que falta ser posto*/
+   Left -> numero de navios que falta ser posto
+   vec -> vetor de deslocação*/
 typedef struct ship
 {
   char name[20];
   int size, num, left, id;
+  Point *vec;
   
 }Ship;
 
+Ship* initiateShip();
+void defineForm(Ship *ship);
+void printShip(Ship* arr);
 
 Ship* initiateShip()
 {
@@ -42,7 +48,29 @@ Ship* initiateShip()
 
   for( int i=0; i<NumDifShip; arr[i].left=arr[i].num, i++ );
 
+  for( int i=0; i<NumDifShip; i++ )
+    arr[i].vec = (Point*)malloc(arr[i].size*sizeof(Point)); 
+
+  defineForm(arr);
+  
   return arr;
+}
+
+void defineForm(Ship *ship)
+{
+  for( int i=0; i<NumDifShip; i++ )
+    for( int j=0; j<ship[i].size; j++ )
+      {
+	ship[i].vec[j].x = j;
+	ship[i].vec[j].y = 0;
+      }
+
+  // carrier
+  ship[0].vec[3].x = 0;
+  ship[0].vec[3].y = -1;
+
+  ship[0].vec[4].x = 1;
+  ship[0].vec[4].y = -1;
 }
 
 void printShip(Ship* arr)

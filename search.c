@@ -46,3 +46,4 @@ Node *simpleSearch(Quad *root, Point p)
 
   return searchLevel(level, p);
 }
+
