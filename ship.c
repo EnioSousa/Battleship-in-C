@@ -1,32 +1,10 @@
-#include <string.h>
-#include "QuadTree.h"
-
-/* Numero de navios diferentes */
-#define NumDifShip 5
-
-
-/* Name -> nome do navio
-   Size -> tamanho que o navio ocupa
-   Num -> numero de navios a serem colocados
-   Left -> numero de navios que falta ser posto
-   vec -> vetor de deslocação*/
-typedef struct ship
-{
-  char name[20];
-  int size, num, left, id;
-  Point *vec;
-  
-}Ship;
-
-Ship* initiateShip();
-void defineForm(Ship *ship);
-void printShip(Ship* arr);
+#include "ship.h"
 
 Ship* initiateShip()
 {
-  Ship* arr = (Ship*)malloc(5*sizeof(Ship));
+  Ship* arr= (Ship*)malloc(5*sizeof(Ship));
 
-  for( int i=0; i<NumDifShip; arr[i].id=i, i++ );
+  for(int i=0; i<NumDifShip; arr[i].id=i, i++);
   
   strcpy(arr[0].name, "Carrier");
   strcpy(arr[1].name, "Battleship");
@@ -46,7 +24,7 @@ Ship* initiateShip()
   arr[3].num=1;
   arr[4].num=4;
 
-  for( int i=0; i<NumDifShip; arr[i].left=arr[i].num, i++ );
+  for(int i=0; i<NumDifShip; arr[i].left=arr[i].num, i++);
 
   for( int i=0; i<NumDifShip; i++ )
     arr[i].vec = (Point*)malloc(arr[i].size*sizeof(Point)); 
@@ -59,7 +37,7 @@ Ship* initiateShip()
 void defineForm(Ship *ship)
 {
   for( int i=0; i<NumDifShip; i++ )
-    for( int j=0; j<ship[i].size; j++ )
+    for( int j=0;j<ship[i].size; j++ )
       {
 	ship[i].vec[j].x = j;
 	ship[i].vec[j].y = 0;

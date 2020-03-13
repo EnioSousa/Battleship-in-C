@@ -1,32 +1,5 @@
-#include "QuadTree.h"
+#include "simpleQueue.h"
 
-typedef struct QNode
-{
-  struct QNode *next;
-  Quad *cur;
-  
-}QNode;
-
-typedef struct Queue
-{
-  QNode *first, *last;
-  int size;
-  
-}Queue;
-
-//
-Queue *newQueue();
-//
-QNode *newQNode(Quad *level);
-//
-void enqueue(Queue *q, Quad *tree);
-//
-Quad *dequeue(Queue *q);
-//
-int isEmpty(Queue* q);
-
-
-//
 Queue *newQueue()
 {
   Queue *temp = (Queue*)malloc(sizeof(Queue));
@@ -38,7 +11,7 @@ Queue *newQueue()
   return temp;
 }
 
-//
+
 QNode *newQNode(Quad *level)
 {
   QNode *no = (QNode*)malloc(sizeof(QNode));
@@ -55,7 +28,7 @@ QNode *newQNode(Quad *level)
   return no;
 }
 
-//
+
 void enqueue(Queue *q, Quad *level)
 {
   QNode *no = newQNode(level);
@@ -75,7 +48,7 @@ void enqueue(Queue *q, Quad *level)
   q->size++;
 }
 
-//
+
 Quad *dequeue(Queue *q)
 {
   if ( q->size==0 )
@@ -93,5 +66,5 @@ Quad *dequeue(Queue *q)
   return t2;;
 }
 
-//
+
 int isEmpty(Queue* q) { return q->size==0 ? 1: 0; };

@@ -1,37 +1,14 @@
 #include "QuadTree.h"
-#include "simpleQueue.c"
 
-//A0
-Point *newPoint(int x, int y);
-//A1
-void newNode(Quad *tree, Point a, int id);
-//A2
-void addNode(Quad *level, Node *no);
-//A3
-Quad *newQuadZero(Point a, Point b);
-//
-Quad *initiateTree();
-//A4
-void newPartition(Quad *tree);
-//
-int possibleToDivide(Quad *tree);
-//A5
-void divideInFour(Quad *tree);
-//A6
-void copyAll(Quad *father);
-//A7
-int whereToPut(Quad level, Point p);
-
-//A0
 Point *newPoint(int x, int y)
 {
   Point *p = (Point*)malloc(sizeof(Point));
 
   if ( p==NULL )
-    {
+     {
       fprintf(stderr,"Falta de memória em newPoint\n");
       exit(EXIT_FAILURE);
-    }
+     }
 
   p->x = x;
   p->y = y;
@@ -39,14 +16,13 @@ Point *newPoint(int x, int y)
   return p;
 }
 
-//A1
-void newNode(Quad *tree, Point a, int id)
+void newNode(Quad *tree,Point a,int id)
 {
   tree->nP++;
 
-  tree->vec = (Node*)realloc(tree->vec, tree->nP*sizeof(Node));
+  tree->vec = (Node*)realloc(tree->vec,tree->nP*sizeof(Node));
 
-  if ( &tree->vec[tree->nP-1]==NULL )
+  if(&tree->vec[tree->nP-1]==NULL )
     {
       fprintf(stderr,"Falta de memória em newNode\n");
       exit(EXIT_FAILURE);
@@ -56,10 +32,12 @@ void newNode(Quad *tree, Point a, int id)
   tree->vec[tree->nP-1].id = id;  
 }
 
-//A2
-void addNode(Quad *level, Node *no) { newNode(level, no->pos, no->id); }
 
-//A3
+void addNode(Quad *level,Node *no) { 
+	 newNode(level,no->pos,no->id); 
+	}
+
+
 Quad *newQuadZero(Point a, Point b)
 {
   Quad *tree = (Quad*)malloc(sizeof(Quad));
@@ -76,6 +54,7 @@ Quad *newQuadZero(Point a, Point b)
   tree->vec = NULL;
   tree->nP = 0;
   
+  
   tree->nw=NULL;
   tree->ne=NULL;
   tree->sw=NULL;
@@ -84,21 +63,21 @@ Quad *newQuadZero(Point a, Point b)
   return tree;
 }
 
-//
+
 Quad *initiateTree()
 {
   Point p1, p2;
 
-  p1.x=1; p1.y=mapSize;
+  p1.x=1;p1.y=mapSize;
   p2.x=mapSize; p2.y=1;
   
-  return newQuadZero(p1, p2);
+  return newQuadZero(p1,p2);
 }
 
-//A4
+
 void newPartition(Quad *tree)
 {
-  if ( possibleToDivide(tree) )
+  if (possibleToDivide(tree) )
     { 
       divideInFour(tree);
       
@@ -109,7 +88,7 @@ void newPartition(Quad *tree)
     }
 }
 
-//
+
 int possibleToDivide(Quad *tree)
 {
   int t1 = tree->br.x - tree->tl.x + 1;
@@ -118,11 +97,11 @@ int possibleToDivide(Quad *tree)
   return t1*t2>=Lim ? 1: 0;
 }
 
-//A5
+
 void divideInFour(Quad *tree)
 {
-  int t1, t2;
-  Point p1, p2;
+  int t1,t2;
+  Point p1,p2;
   
   t1 = (tree->br.x - tree->tl.x)/2;
   t2 = (tree->tl.y - tree->br.y)/2;
@@ -131,7 +110,7 @@ void divideInFour(Quad *tree)
   p2.x = t1;
   p2.y = t2 + 1;
 
-  tree->nw = newQuadZero(tree->tl, p2);
+  tree->nw = newQuadZero(tree->tl,p2);
 
   // NortEast
   p1.x = t1 + 1;
@@ -167,9 +146,11 @@ void divideInFour(Quad *tree)
 //A6
 void copyAll(Quad *father)
 {  
-  for( int i=0; i<father->nP; i++ )
+  Node *temp;
+  
+  for(int i=0; i<father->nP; i++ )
     {
-      Node *temp = &father->vec[i];
+      temp = &father->vec[i];
 
       switch( whereToPut(*father, temp->pos) )
 	{
@@ -185,7 +166,7 @@ void copyAll(Quad *father)
 	  addNode(father->nw, temp);
 	  break;
 	  
-        default:
+     default:
 	  addNode(father->ne, temp);
 	  break;
 	}     
@@ -193,24 +174,29 @@ void copyAll(Quad *father)
 }
 
 //A7
+
 int whereToPut(Quad level, Point p)
 {
-  int t1, t2;
+  int t1,t2;
   
   t1 = (level.br.x - level.tl.x)/2;
   t2 = (level.tl.y - level.br.y)/2;
 
-  if ( level.nw==NULL ) // 0=>poem no nivel currente
+  if (level.nw==NULL ) // 0=>poem no nivel currente
     return 0;
+  else 
   
-  else if ( p.x<=t1 && p.y<=t2 ) // 1=>poe no filho SW
+  if (p.x<=t1 && p.y<=t2 ) // 1=>poe no filho SW
     return 1;
 
-  else if ( p.x<=t1 ) //3=>poe no filho NW
+  else 
+    
+    if (p.x<=t1 ) //3=>poe no filho NW
     return 3;
 
-  else if ( p.y<=t2 ) //2=>pow no filho SE
-    return 2;
+  else 
+     if ( p.y<=t2 ) //2=>pow no filho SE
+     return 2;
 
   else //4=>poe no filho NE
     return 4;

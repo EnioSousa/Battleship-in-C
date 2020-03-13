@@ -1,15 +1,9 @@
-//
-Quad *searchDepth(Quad *tree, Point p);
-//
-Node *searchLevel(Quad *level, Point p);
-//
-Node *simpleSearch(Quad *root, Point p);
+#include "search.h"
+#include "list.h"
 
-  
-//
 Quad *searchDepth(Quad *tree, Point p)
 {
-  switch( whereToPut(*tree, p) )
+  switch( whereToPut(*tree, p))
     {
     case 0:
       return tree;
@@ -42,8 +36,26 @@ Node *searchLevel(Quad *level, Point p)
 //
 Node *simpleSearch(Quad *root, Point p)
 {
-  Quad *level = searchDepth(root, p);
+  Quad *level = searchDepth(root,p);
 
   return searchLevel(level, p);
 }
+
+
+
+Node *search_A(Quad *root, Point p){
+	
+        
+        list* open = initiateList();
+        list* close = initiateList();
+        list* path = initiateList();
+        
+ 
+ 
+}
+
+
+
+
+
 

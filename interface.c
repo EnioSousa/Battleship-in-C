@@ -1,8 +1,9 @@
-#include "QuadTree.h"
+#include "interface.h"
+#include "simpleQueue.h"
 
 void printNode(Node no)
 {
-  printf("Id=%d (%d,%d)\n", no.id, no.pos.x, no.pos.y);
+  printf("Id=%d (%d,%d)\n",no.id, no.pos.x, no.pos.y);
 }
 
 void printLevel(Quad *level)
