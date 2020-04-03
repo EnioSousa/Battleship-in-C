@@ -24,10 +24,10 @@ Ship* initiateShip()
   arr[3].num=1;
   arr[4].num=4;
 
-  for(int i=0; i<NumDifShip; arr[i].left=arr[i].num, i++);
+  for(int i=0;i<NumDifShip;arr[i].left=arr[i].num, i++);
 
-  for( int i=0; i<NumDifShip; i++ )
-    arr[i].vec = (Point*)malloc(arr[i].size*sizeof(Point)); 
+  for(int i=0; i<NumDifShip; i++ )
+  arr[i].vec = (Point*)malloc(arr[i].size*sizeof(Point)); 
 
   defineForm(arr);
   
@@ -36,19 +36,19 @@ Ship* initiateShip()
 
 void defineForm(Ship *ship)
 {
-  for( int i=0; i<NumDifShip; i++ )
+    for( int i=0; i<NumDifShip; i++ )
     for( int j=0;j<ship[i].size; j++ )
       {
 	ship[i].vec[j].x = j;
 	ship[i].vec[j].y = 0;
       }
 
-  // carrier
-  ship[0].vec[3].x = 0;
-  ship[0].vec[3].y = -1;
+  // carrier                                   
+  ship[0].vec[3].x = 0;                       
+  ship[0].vec[3].y = -1;                       
 
-  ship[0].vec[4].x = 1;
-  ship[0].vec[4].y = -1;
+  ship[0].vec[4].x = 0;
+  ship[0].vec[4].y = 1;
 }
 
 void printShip(Ship* arr)
@@ -60,3 +60,4 @@ void printShip(Ship* arr)
       printf("num=%d, left=%d\n\n", arr[i].num, arr[i].left);
     }
 }
+

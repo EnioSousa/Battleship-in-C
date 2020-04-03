@@ -1,86 +1,321 @@
 #include "interface.h"
-#include "simpleQueue.h"
+#include "map.h"
 
-void printNode(Node no)
+void printAll(Map *m)
 {
-  printf("Id=%d (%d,%d)\n",no.id, no.pos.x, no.pos.y);
+  printInfo(m);
+  printMap(m);
 }
 
-void printLevel(Quad *level)
+void printInfo(Map *m)
 {
-  printf("no=%d\n", level->nP);
-  
-  if ( level->nw==NULL )
-    for( int i=0; i<level->nP; i++ )
-      printNode(level->vec[i]);
+  printf(ANSI_COLOR_GRAY"Map Size = %d, Num of Points = %d\n"ANSI_COLOR_RESET, m->mapSize, m->nPoint);
 
-  else
-    printf("No nodes in this level\n");
+  putchar('\n');
 }
 
-void printAllLevel(Quad *level, int n)
+void printMap(Map *m)
+{{
+    for( int i=m->mapSize-1; i>=0; putchar('\n'), i-- )
+    for( int j=0; j<m->mapSize;j++ ){
+    if(m->map[i][j]=='#')
+    printf(ANSI_COLOR_BLUE "%c "ANSI_COLOR_RESET,m->map[i][j]);
+    else
+    if(m->map[i][j]=='H')
+    printf(ANSI_COLOR_YELLOW "%c "ANSI_COLOR_RESET,m->map[i][j]);
+    else 
+    printf(ANSI_COLOR_GREEN"%c "ANSI_COLOR_RESET,m->map[i][j]);
+ }
+    putchar('\n');
+}
+}
+void printMaphis(Map *m)
 {
-  if ( level==NULL )
-    return;
-  
-  printf("Level=%d\n", n);
+    for( int i=m->mapSize-1; i>=0; putchar('\n'), i-- )
+    for( int j=0; j<m->mapSize;j++ ){
+    if(m->map[i][j]=='1')
+    printf(ANSI_COLOR_GREEN "%c "ANSI_COLOR_RESET,m->map[i][j]);
+    else 
+    if(m->map[i][j]=='0')
+    printf(ANSI_COLOR_RED "%c "ANSI_COLOR_RESET,m->map[i][j]);
+    else
+    printf(ANSI_COLOR_BLUE"%c "ANSI_COLOR_RESET,m->map[i][j]);
+}
+    putchar('\n');
+}
 
-  printLevel(level);
+void printPoint(Point *p)
+{
+  printf("(%d,%d)\n", p->x, p->y);
+}
 
-  printAllLevel(level->nw, n+1);
-  printAllLevel(level->ne, n+1);
-  printAllLevel(level->sw, n+1);
-  printAllLevel(level->se, n+1);
+void clearTerminal(){
+    #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+        system("clear");
+    #endif
+
+    #if defined(_WIN32) || defined(_WIN64)
+        system("cls");
+    #endif
 }
 
 
-void initiateBiArr(char map[][mapSize+1])
+void printMap2(Map* map){
+	printf(ANSI_COLOR_GREEN"Your Ships\n"ANSI_COLOR_RESET);
+	printMap(map);
+	
+	};
+
+
+
+void printRepeat(int n, char ch)
 {
-  for( int i=0; i<=mapSize; i++ )
-    for( int j=0; j<=mapSize; map[i][j]='#', j++ );
+  for( int i=0; i<n; putchar(ch), i++ );
 }
 
-void transToMap(char map[][mapSize+1], Quad *level)
+
+void flush_in()
 {
-  if ( level==NULL || level->nw!=NULL )
-    return;
+   int ch;
 
-  for( int i=0; i<level->nP; i++ )
-    {
-      Node temp = level->vec[i];
+   while( (ch = fgetc(stdin)) != EOF && ch != '\n' ){}
+} 
 
-      map[temp.pos.y][temp.pos.x] = temp.id + '0';
-    }
+void winMeme(){
+	printf(ANSI_COLOR_BLUE"░░░░░░▄██████████████▄░░░░░░░\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE"░░░░▄██████████████████▄░░░░░\n"ANSI_COLOR_RESET); 
+	printf(ANSI_COLOR_BLUE"░░░█▀░░░░░░░░░░░▀▀███████░░░░\n"ANSI_COLOR_RESET) ;
+	printf(ANSI_COLOR_BLUE"░░█▌░░░░░░░░░░░░░░░▀██████░░░\n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"░█▌░░░░░░░░░░░░░░░░███████▌░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"░█░░░░░░░░░░░░░░░░░████████░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"▐▌░░░░░░░░░░░░░░░░░▀██████▌░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"░▌▄███▌░░░░▀████▄░░░░▀████▌░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"▐▀▀▄█▄░▌░░░▄██▄▄▄▀░░░░████▄▄░\n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"▐░▀░░═▐░░░░░░══░░▀░░░░▐▀░▄▀▌▌ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"▐░░░░░▌░░░░░░░░░░░░░░░▀░▀░░▌▌ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"  ░░░▄▀░░░▀░▌░░░░░░░░░░░░▌█░▌▌ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE" ░▌░░▀▀▄▄▀▀▄▌▌░░░░░░░░░░▐░▀▐▐░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE" ░▌░░▌░▄▄▄▄░░░▌░░░░░░░░▐░░▀▐░░\n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE" ░█░▐▄██████▄░▐░░░░░░░░█▀▄▄▀░░\n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE" ░▐░▌▌░░░░░░▀▀▄▐░░░░░░█▌░░░░░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE" ░░█░░▄▀▀▀▀▄░▄═╝▄░░░▄▀░▌░░░░░░\n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"  ░░░▌▐░░░░░░▌░▀▀░░▄▀░░▐░░░░░░░\n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"  ░░░▀▄░░░░░░░░░▄▀▀░░░░█░░░░░░░ \n"ANSI_COLOR_RESET) ,
+    printf(ANSI_COLOR_BLUE"  ░░░▄█▄▄▄▄▄▄▄▀▀░░░░░░░▌▌░░░░░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"  ░░▄▀▌▀▌░░░░░░░░░░░░░▄▀▀▄░░░░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"  ▄▀░░▌░▀▄░░░░░░░░░░▄▀░░▌░▀▄░░░ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_BLUE"  ░░░░▌█▄▄▀▄░░░░░░▄▀░░░░▌░░░▌▄▄ \n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_YELLOW"  ░╔╗║░╔═╗░═╦═░░░░░╔╗░░╔═╗░╦═╗░\n"ANSI_COLOR_RESET) ;
+    printf(ANSI_COLOR_YELLOW"  ░║║║░║░║░░║░░░░░░╠╩╗░╠═╣░║░║░ \n"ANSI_COLOR_RESET); 
+    printf(ANSI_COLOR_YELLOW"  ░║╚╝░╚═╝░░║░░░░░░╚═╝░║░║░╩═╝░\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW"  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n"ANSI_COLOR_RESET); 
+wait();
+clearTerminal();
 }
 
-void printBiArray(char map[][mapSize+1])
-{
-  for( int i=mapSize; i>0; putchar('\n'), i-- )
-    for( int j=1; j<=mapSize; printf("%c ", map[i][j]), j++);
-}
 
-void printMap(Quad *root)
-{
-  char map[mapSize+1][mapSize+1];
-  initiateBiArr(map);
 
-  Queue *q = newQueue();
-  enqueue(q, root);
-
-  while ( !isEmpty(q) )
-    { 
-      Quad *temp = dequeue(q);
-
-      transToMap(map, temp);
-
-      if ( temp->nw!=NULL )
-	{
-	  enqueue(q, temp->nw);
-	  enqueue(q, temp->ne);
-	  enqueue(q, temp->sw);
-	  enqueue(q, temp->se);      
+void flag(char *str){
+	                                                                       
+printf("           ⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣀⠀ \n"); 
+printf("           ⣰⣿⣿⣿⣿⠿⠿⣿⣿⣿⣿⣿⣿⣿⣧⢀ \n");        
+printf("          ⣿⣿⣿⠋⠀⠀⠀⠀⠀⠙⠀⠙⣿⣿⣿⣷⢳⢀⠀⠀  ,'                                    \n");               
+printf("          ⣿⣿⣿⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿                                  \n");                      
+printf("         ⣸⣿⣿⣿⠸⠀⠀⠀⠒⠒⠒⠐⠀⠀⢿⣿⣿⣿⣿⣿⠀                                   \n");                             
+printf("         ⣴⣿⣿⣿⡿⠀⠒⣋⣙⡒⢰⠀⠤⣖⠒⢾⣿⣿⣿⣿⣧                                      \n");                                    
+printf("         ⢺⣿⣿⣿⣿⢀⠀⠀⠉⠉⠉⠸⠀⡇⠉⠉⠀⢿⣿⣿⣿⣄                                  \n");                                            
+printf("         ⠙⣿⣿⣧⢻⠀⠀⠀⠀⠀⠠⠀⠰⠀⠀⠀⣸⠸⣿⣿⠿⠰⠀                                  \n");
+printf("         ⠹⣿⣿⣿⣷⠀⡠⠙⣲⣔⣅⢡⣰⣷⣿⣿⣿⣧⠀                                  \n");             
+printf("          ⣼⣿⣿⣿⣿⠀⡿⠭⠭⠭⠭⢿⠀⣿⢻⣿⣿⠃                                      \n");
+printf("          ⠙⠛⣿⢻⠹⣿⠐⠙⠛⠟⠉⢀⣴⡟⢿⣿⡏                                     \n");
+printf("             ⡟⠀⠀⠻⣦⣤⣶⠾⠋⠀⠀⠁⡦⢄⢀                                    \n");
+printf("           ⡠⠁⡇⠑⢄⠀⠀⠀⠀⠀⠀⠔⠀⠀⠁⠀⠀⠀⠉⠁                                        \n");
+printf("            ⠔⣇⠀⠀⠀⠑⡤⠤⢎⠁⠀⠀⡘⠀⠀⠀⠀⠀⠀                            \n");
+printf("	          ⠀      ⢢⠠⠀⡠⢆⠀⠀⡠⠙⢄⠀⡸⠀                                                  \n");
+printf("	   Congratulations you are the winner: %s     \n",str);
+waitLong();
 	}
-    }
 
-  printBiArray(map);
+
+
+
+void information(){
+  clearTerminal();
+  printf(ANSI_COLOR_GREEN"\nThe game pieces: \n"ANSI_COLOR_RESET);
+  printf(ANSI_COLOR_RED"\nid: 0------> Carrier\n\n"ANSI_COLOR_RESET);
+  printf("Size the ship occupies: 5 Points\n");
+  printf("Graphic piece:\n\n");
+  printCarrier();
+  printf("\nNumber of ships: 1\n");
+  printf(ANSI_COLOR_RED"\nid: 1------> Battleship\n\n"ANSI_COLOR_RESET);
+  printf("Size the ship occupies: 4 Points\n");
+  printf("Graphic piece:\n");
+  printBattleship();
+  printf("Number of ships: 2\n");
+  printf(ANSI_COLOR_RED"\nid: 2------> Cruiser\n\n"ANSI_COLOR_RESET);
+  printf("Size the ship occupies: 3 Points\n");
+  printf("Graphic piece:\n");
+  printCruiser();
+  printf("Number of ships: 2\n\n");
+  waitLong();
+  printf(ANSI_COLOR_RED"\nid: 3------> Submarine\n\n"ANSI_COLOR_RESET);
+  printf("Size the ship occupies: 3 Points\n");
+  printf("Graphic piece:\n");
+  printSubmarine();
+  printf("Number of ships: 1\n");
+  printf(ANSI_COLOR_RED"\nid: 4------> Destroyer\n\n"ANSI_COLOR_RESET);
+  printf("Size the ship occupies: 2 Points\n");
+  printf("Graphic piece:\n");
+  printDestroyer();
+  printf("Number of ships: 4\n\n");
+  
+  waitLong();
+  	}
+	
+void waitLong(){
+	printf(ANSI_COLOR_RED "wait a few seconds\n"ANSI_COLOR_RESET);
+    sleep(4); 
+    clearTerminal();
+	}
+
+
+void temporyPrint(){
+	printf(ANSI_COLOR_YELLOW"Use lowercase in the direction:\n");
+	printf("North ------> n\n");
+	printf("South ------> s\n");
+	printf("West -------> w\n");
+    printf("East--------> e\n\n"ANSI_COLOR_RESET);
+   
+	}
+
+void wait(){
+	printf(ANSI_COLOR_RED "wait a few seconds\n"ANSI_COLOR_RESET);
+    sleep(1); 
+    clearTerminal();
+	}
+
+int checkDir(char dir){
+	
+ switch (dir)
+{
+   case 'w':
+   return 1;
+   break;
+   
+   
+   case 'e':
+   return 1;
+   break;
+   
+   
+   
+   case 'n':
+   return 1;
+   break;
+   
+   
+   
+   case 's':
+   return 1;
+   break;
+   
+   default:
+   printf("Invalid direction\n");
+   return 0; 
 }
+	
+}
+
+void printCarrier(){
+printf(ANSI_COLOR_YELLOW"0    \n");  
+printf("0 0 0\n");     
+printf("0    \n"ANSI_COLOR_RESET);   
+	}
+
+
+
+void printBattleship(){
+	printf(ANSI_COLOR_YELLOW"     \n");  
+    printf("1 1 1 1\n");     
+    printf("     \n"ANSI_COLOR_RESET);
+	
+	}
+
+
+void printCruiser(){
+    printf(ANSI_COLOR_YELLOW"     \n");  
+    printf("2 2 2\n");     
+    printf("     \n"ANSI_COLOR_RESET);
+
+}
+
+void printSubmarine(){
+	printf(ANSI_COLOR_YELLOW"     \n");  
+    printf("3 3 3\n");     
+    printf("     \n"ANSI_COLOR_RESET);
+	}
+
+
+void printDestroyer(){
+	printf(ANSI_COLOR_YELLOW"     \n");  
+    printf("4 4\n");     
+    printf("     \n"ANSI_COLOR_RESET);
+	}
+
+
+
+void printfActive(Map* map){
+	int count=0,count1=0,count2=0,count3=0,count4=0;
+	printf(ANSI_COLOR_GREEN"Enemy actives: "ANSI_COLOR_RESET);
+	
+	for(int i=0;i<map->mapSize;i++){
+	for(int j=0;j<map->mapSize;j++){
+	if(map->map[i][j]=='0')
+	count++;
+	else
+	if(map->map[i][j]=='1')
+	count1++;
+	else
+	if(map->map[i][j]=='2')
+	count2++;
+	else
+	if(map->map[i][j]=='3')
+	count3++;
+	else
+	if(map->map[i][j]=='4')
+	count4++;
+}
+}
+ if(count>0)
+ printf(ANSI_COLOR_RED"Carrier "ANSI_COLOR_RESET);
+ if(count1>0)
+ printf(ANSI_COLOR_RED"Battleship "ANSI_COLOR_RESET);
+ if(count2>0)
+ printf(ANSI_COLOR_RED"Cruiser "ANSI_COLOR_RESET);
+ if(count3>0)
+ printf(ANSI_COLOR_RED"Submarine "ANSI_COLOR_RESET);
+ if(count4>0)
+ printf(ANSI_COLOR_RED"Destroyer "ANSI_COLOR_RESET);
+ 
+  printf("\n");
+
+}
+	
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
