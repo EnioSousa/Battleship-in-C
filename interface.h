@@ -4,7 +4,8 @@
 #include "ship.h"
 #include "game.h"
 #include <unistd.h>
-#define ANSI_COLOR_RED     	"\x1b[31m" //cores em ANSI utilizadas 
+//cores em ANSI utilizadas 
+#define ANSI_COLOR_RED     	"\x1b[31m" 
 #define ANSI_COLOR_GRAY    	"\e[0;37m"
 #define ANSI_COLOR_DARK_GRAY 	"\e[1;30m"
 #define ANSI_COLOR_GREEN	"\e[0;32m"
@@ -22,7 +23,7 @@ void printRepeat(int n, char ch);
 void flush_in();
 void printMaphis(Map *m);
 void winMeme();
-void flag(char* str);
+void finalGame(char* str);
 void information();
 void wait();
 void waitLong();
@@ -35,4 +36,5 @@ void printCruiser();
 void printSubmarine();
 void printDestroyer();
 void printfActive(Map* map);
+void informationShip(Ship* s);
 #endif

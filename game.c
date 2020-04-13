@@ -1,8 +1,7 @@
 #include "game.h"
-  
-  //main
-  
-  int main(){
+#include <ctype.h>  
+//main
+ int main(){
   
   srand(time(NULL));
   int size,q=1;
@@ -17,29 +16,28 @@
   wait();
   
     while(q){
-    q=0;
     game(p1,p2,size);
-    flush_in();
     q=askContinue();
     wait();
     if(q==1){
     restartGame(p1,p2);
     }
-}
-  clearMemory(p1,size);
-  clearMemory(p2,size);
+  }
+    clearMemory(p1,size);
+    clearMemory(p2,size);
+  
   return 0;
 }
 
 //size the board 
 
 int defineBattlefieldSize() {
-   int size,i=1;
    
+   int size,i=1;
    while (i){
    size = defineSize();
    clearTerminal();
-   if (minBattlefieldSize(size)==1)
+   if(minBattlefieldSize(size)==1)
    i=0;
    }
   
@@ -61,6 +59,7 @@ int defineSize()
 //limit minimum size 
 
 int minBattlefieldSize(int size){
+	
 	if(size>=9)
 	return 1;
 	return 0;
@@ -71,7 +70,9 @@ int minBattlefieldSize(int size){
 Player *initiatePlayer(int size)
 {
   Player *p = (Player*)malloc(sizeof(Player));
-
+  if(p==NULL)
+  errorMessageMem("player");
+  
   p->map = newMap(size);
   p->his = newMap(size);
   p->ship = initiateShip();
@@ -88,18 +89,20 @@ Player *initiatePlayer(int size)
 
 void askForMap(char *str, Map *map, Ship *ship,int i)
 { 
-  if(i==0)
-  information();
+     if(i==0)
+     information();
+     printf(ANSI_COLOR_GREEN"If you want to insert Manual press y, if you want Random press any key\n"ANSI_COLOR_RESET);
+     char ch = getchar();
+     getchar();
   
-  printf(ANSI_COLOR_GREEN"If you want to insert Manual press y, if you want Random press any key\n"ANSI_COLOR_RESET);
-  char ch = getchar();
-  getchar(); 
+   
+     if( ch=='y' ){
+	  insertManual(map, ship);
+      }
+     else{
+	  insertRandom(map, ship);
+      }
 
-  if ( ch=='y' ){
-    insertManual(map, ship); }
-  else{
-    insertRandom(map, ship);
-    }
 }
 
 // get player name
@@ -108,16 +111,18 @@ char *getName()
 { 
   char *str = (char*)malloc(maxNameSize*sizeof(char));
   if(str==NULL)
-    errorMessageMem("get name player");
+  errorMessageMem("get name player");
   
   printf(ANSI_COLOR_RED"Your name please \n"ANSI_COLOR_RESET);
   if(fgets(str,maxNameSize, stdin)) { 
     if (NULL == strchr(str, '\n'))
      eat_Extra(); 
-     return str; }
+     return str; 
+     }
 }
 
 void eat_Extra(void) {
+    
     int ch;
     while ((ch = getchar()) != '\n') {
         if (ch < 0)
@@ -125,10 +130,10 @@ void eat_Extra(void) {
     }
 }
 
-
 //start game
 
 void game(Player *p1, Player *p2,int size){ 
+  
   int f=0,c=1,q;
   Player* turn;
   Player* adv;
@@ -138,8 +143,10 @@ void game(Player *p1, Player *p2,int size){
   adv=p2;
   
   while(c){
+	   
 	   q=1;
 	   printPlayerInfo(turn,adv);
+	   
 	   while(q){
 	   if(f==1)
 	   printPlayerInfo(turn,adv);
@@ -166,35 +173,73 @@ void game(Player *p1, Player *p2,int size){
     }
     
    clearGame(p1,p2);
-   
- }
+   }
 
+
+// check input
+int inputCheck(){
+	char x[10];
+	int i=1,v;
+	
+	while(i){
+	if(fgets(x,10, stdin)) { 
+    if (NULL == strchr(x, '\n'))
+    eat_Extra(); 
+    }
+	for (int j=0;j<strlen(x)-1;j++)
+        if (!isdigit(x[j]))
+        {   
+			printf ("Entered input is not a number\n");
+            break;
+        }
+        else
+        i=0;
+    }
+     v=atoi(x);
+    return v;
+ } 
+
+
+char inputCheckChar(){
+	int i=1;
+	char x[10];
+	while(i){
+	if(fgets(x,10, stdin)) { 
+    if (NULL == strchr(x, '\n'))
+    eat_Extra(); 
+    }
+    if(strlen(x)==2)
+    i=0;
+    else
+    printf("Please see game information\n");
+    }
+    return x[0];
+  
+ } 
+	
 
 //ask for the point
 
 Point* askPoint(Point* p,int size){
-	int x,y;
 	int i=1;
 	
 	while(i){
 	printf(ANSI_COLOR_GRAY"Coordinates of your shoot:\n\n"ANSI_COLOR_RESET);
 	printf(ANSI_COLOR_GRAY"x:"ANSI_COLOR_RESET);
-	scanf("%d",&x);
-	p->x=x;
+	p->x=inputCheck();
 	printf(ANSI_COLOR_GRAY"\ny:"ANSI_COLOR_RESET);
-	scanf("%d",&y);
-	p->y=y;
-    printf("\n");
+	p->y=inputCheck();
+	printf("\n");
     if(checkPoint(p,size)!=0)
     i=0;
     }
-	
 	return p;
 	}
-	
+
 //check the point
 
 int checkPoint(Point* p,int size){
+	
 	if(p->x>size || p->y>size ||p->x<=0 || p->y<=0 ){ 
 	printf(ANSI_COLOR_RED"Coordinates goes beyond the battlefield\n\n"ANSI_COLOR_RESET);
 	return 0;
@@ -205,12 +250,12 @@ int checkPoint(Point* p,int size){
 //check victory
 
 int checkWin(Player* p1){
+	
 	if(p1->nhit==Npoints){
 	clearTerminal();
-	flag(p1->name );
+	finalGame(p1->name );
     return 1;
     }
-    
     else 
     return 0;
 	}
@@ -221,14 +266,12 @@ int checkWin(Player* p1){
 
 void clearMemory(Player* p1, int size){
 	
-	
 	free(p1->ship->name);
 	free(p1->ship->vec);
 	free(p1->name);
 	clearMemoryMap(p1->map,size);
 	clearMemoryMap(p1->his,size);
 	free(p1);
-
 }
 
 void clearMemoryMap(Map* p1,int size){
@@ -244,6 +287,7 @@ void clearMemoryMap(Map* p1,int size){
 //clean the board
 
 void clearGame(Player* p1,Player* p2){
+	
 	deleteAll(p1->map);
 	deleteAll(p2->map);
 	deleteAll(p1->his);
@@ -253,6 +297,7 @@ void clearGame(Player* p1,Player* p2){
 //restart the game
   
 void restartGame(Player* p1,Player* p2){
+    
     p1->nhit=0;
     p2->nhit=0;
     
@@ -267,17 +312,16 @@ void restartGame(Player* p1,Player* p2){
     askForMap(p2->name, p2->map, p2->ship,1);
     printInfo(p2->map);
     wait();
-   
-	}
+   }
 
 //ask if you want to continue
 
 int askContinue(){
+	
 	printf(ANSI_COLOR_GREEN"You want to play again?\n\n"ANSI_COLOR_RESET);
 	printf(ANSI_COLOR_YELLOW"Yes --> press y or No--> press any key  \n"ANSI_COLOR_RESET);
-	
 	char ch = getchar();
-    
+    getchar();
     if ( ch=='y' )
     return 1;
     else
@@ -292,22 +336,19 @@ int checkShoot(Point* p, Player* p1,Player* p2){
 	 if(search(p2->map,p)==0){
      printf(ANSI_COLOR_RED"Didn't hit the ship\n"ANSI_COLOR_RESET);
      wait();
-	 deletePoint(p1->his,p);
 	 insertPoint(p1->his,p,0);  //zero falhou --->this	 
      return 1;
      }
+	 
 	 else{
-	    //printf(ANSI_COLOR_GREEN"Hit the ship\n"ANSI_COLOR_RESET);
-	    //deletePoint(p1->his,p);
-	    insertPoint(p1->his,p,1);	// 1 acertou---->this
-	    deletePoint(p2->map,p);
-	    insertHit(p2->map,p,'H');
-	    p1->nhit++;
-	    if(checkWin(p1)==1)
-	    return 0;
-	    else
-	    return 99;
-        }
+	 insertPoint(p1->his,p,1);	// 1 acertou---->this
+	 insertHit(p2->map,p,'H');
+	 p1->nhit++;
+	 if(checkWin(p1)==1)
+	 return 0;
+	 else
+	 return 99;
+     }
   }
 
 
@@ -347,16 +388,16 @@ printf(ANSI_COLOR_GREEN "                                                       
 printf(ANSI_COLOR_GREEN "                    ~                               \n"ANSI_COLOR_RESET);
 printf("                                                   Console edition  \n");  
 printf(ANSI_COLOR_GREEN "\n  PRESS ANY KEY \n"ANSI_COLOR_RESET);
+
 getchar();
 clearTerminal();
- }
+}
 
 
 //print  information the player 
 
 void printPlayerInfo(Player *p,Player* p1)
 {
-  
   printfActive(p1->map);
   printf(ANSI_COLOR_YELLOW"Player :%s\n"ANSI_COLOR_RESET, p->name);
   printf(ANSI_COLOR_GREEN"Your Ships\n"ANSI_COLOR_RESET);
@@ -373,6 +414,13 @@ void printPlayer(Player *p)
   printf(ANSI_COLOR_GREEN"You history of atacks\n"ANSI_COLOR_RESET);
   printMaphis(p->his);
 }
+
+
+
+
+
+
+
 
 
 

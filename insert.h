@@ -5,6 +5,7 @@
 #include <time.h>
 
 
+
 /*----------------------Insert Manual-------------------------*/
 void insertManual(Map *, Ship *);
 
@@ -25,6 +26,7 @@ int shipAvaliable(Ship *);
 int someShipLeft(Ship *);
 int confAvaliable(Map *, Ship *, Point *, char );
 int voidAroundPoint(Map *, Point *);
+
 
 /*---------------------Generate next/random-------------------------*/
 void randomDir(char *);

@@ -1,38 +1,45 @@
 #include "insert.h"
 #include "interface.h"
+#include <ctype.h>
+#include <stdlib.h> 
+
 
 
 /*----------------------Insert Manual-------------------------*/
-void insertManual(Map *m, Ship *ship)
-{
-  int id, x, y,c;
-  char dir;	
+
+void insertManual(Map *m, Ship *ship){
+  char dir;
+  int id, x,y,c;
   Point p;
-  int tmp=1;
-  //srand(time(NULL));
   
   while ( someShipLeft(ship) )
     { 
 	  c=1;
 	  clearTerminal();
-      if(tmp==1)
-      temporyPrint();
-      if(tmp==0)
-      printMap2(m);
+      
       while(c){
-      c=0;
-      printf(ANSI_COLOR_GREEN "Enter the ship's identification,the x and y coordinates and the direction of the ship\n"ANSI_COLOR_RESET);
-      if(tmp==1){
-      printf(ANSI_COLOR_GREEN "Example of an entry: 4 4 5 w \n"ANSI_COLOR_RESET);   
-      tmp=0;
+       c=0;
+     
+       printf(ANSI_COLOR_YELLOW "Manual\n\n"ANSI_COLOR_RESET);
+       informationShip(ship);
+       printMap2(m);
+       printf(ANSI_COLOR_GREEN "Ship identification\n");   
+       id=inputCheck();
+       printf("X coordinate\n");
+       x=inputCheck();
+       printf("Y coordinate\n");
+       y=inputCheck();
+       printf("The direction of the ship\n"ANSI_COLOR_RESET);
+       temporyPrint();
+       dir=inputCheckChar();
+       
+       if(checkDir(dir)==0){
+       wait();
+       clearTerminal();
+       c=1;
+       }
       }
-      scanf("%d %d %d %c", &id, &x, &y, &dir);
-      if(checkDir(dir)==0){
-      wait();
-      clearTerminal();
-      c=1;
-      }
-      }
+      
       p.x=x; p.y=y;
 
       if( placeIsPossible(m, &ship[id], &p, dir) )
@@ -41,6 +48,7 @@ void insertManual(Map *m, Ship *ship)
 	  ship[id].left--;
 
 	  printAll(m);
+	  
 	}
 
       else
@@ -93,15 +101,16 @@ void insertShip(Map *m, Ship *ship, Point *ref, char dir)
       insertPoint(m, &p, ship->id);
     }
 }
+
+
 void insertHit (Map *m, Point *p, char id)
 {
-  if ( !insideOfMap(m, p) )
-    errorMessage2("insertPoint", p);
+  if (!insideOfMap(m, p) )
+    errorMessage2("insertHit", p);
 
   m->map[p->y-1][p->x-1] = id;
   m->nPoint++;  
 }
-
 
 
 // mudar esta função se a estrutura map mudar
@@ -299,3 +308,4 @@ void errorMessage2(char *str, Point *p)
   fprintf(stderr, "Error on %s, Point (%d,%d) out of bounds\n", str, p->x, p->y);
   exit(EXIT_FAILURE);  
 }
+

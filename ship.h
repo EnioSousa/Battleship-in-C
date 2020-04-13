@@ -5,12 +5,13 @@
 /* Numero de navios diferentes */
 #define NumDifShip 5
 
-/* Name -> nome do navio
+/* 
+   Name -> nome do navio
    Size -> tamanho que o navio ocupa
    Num -> numero de navios a serem colocados
    Left -> numero de navios que falta ser posto
    vec -> vetor de deslocação
-   * */
+*/
 
 typedef struct ship
 {
@@ -24,6 +25,4 @@ typedef struct ship
 Ship* initiateShip();
 void defineForm(Ship *);
 void printShip(Ship *);
-
-
 #endif

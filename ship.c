@@ -3,7 +3,9 @@
 Ship* initiateShip()
 {
   Ship* arr= (Ship*)malloc(5*sizeof(Ship));
-
+  if(arr==NULL)
+  errorMessageMem("Ship");
+  
   for(int i=0; i<NumDifShip; arr[i].id=i, i++);
   
   strcpy(arr[0].name, "Carrier");
@@ -25,10 +27,11 @@ Ship* initiateShip()
   arr[4].num=4;
 
   for(int i=0;i<NumDifShip;arr[i].left=arr[i].num, i++);
-
-  for(int i=0; i<NumDifShip; i++ )
+  for(int i=0; i<NumDifShip; i++ ){
   arr[i].vec = (Point*)malloc(arr[i].size*sizeof(Point)); 
-
+  if(arr[i].vec==NULL)
+  errorMessageMem("New Point");
+  }
   defineForm(arr);
   
   return arr;

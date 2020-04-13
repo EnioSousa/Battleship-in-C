@@ -27,6 +27,4 @@ void deleteAll(Map *);
 void deletePoint(Map *, Point *);
 void printPoint(Point *);
 Point *newPoint();
-
-
 #endif

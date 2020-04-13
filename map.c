@@ -4,10 +4,11 @@
 Map* newMap(int size)
 {  
   Map *m = (Map*)malloc(sizeof(Map));
-
+  if(m==NULL)
+  errorMessageMem("Map");
+  
   m->nPoint = 0;
   m->mapSize = size;
-  
   m->map = newBiArray(size);
 
   initiateBiArray(m->map,size, WATER);
@@ -22,13 +23,11 @@ char** newBiArray(int size)
   if( map == NULL )
     errorMessageMem("newMap");
   
-  for( int i=0; i<size; i++ )
-    {
+  for(int i=0; i<size; i++ ){
       map[i] = (char*)malloc(size*sizeof(char));
-
       if ( map[i] == NULL )
-	errorMessageMem("newMap");
-    }
+	  errorMessageMem("newMap");
+     }
 
   return map;
 }
@@ -48,10 +47,12 @@ void errorMessageMem(char *str)
 
 int search(Map *m,Point *p)
 {
-  if(insideOfMap(m,p) && m->map[p->y-1][p->x-1] == 'H')
-  return 0;
+  if(insideOfMap(m,p)){
+   if(m->map[p->y-1][p->x-1] == 'H' || m->map[p->y-1][p->x-1] == WATER )
+    return 0;
+  }
   else
-  return insideOfMap(m,p) && m->map[p->y-1][p->x-1] == WATER ? 0: 1;
+  return 1;
 }
 
 void deleteAll(Map *m)
@@ -77,11 +78,10 @@ Point *newPoint()
 {
   Point *p = (Point*)malloc(sizeof(Point));
 
-  if ( p==NULL )
-     {
+  if ( p==NULL ){
       errorMessageMem("Point");
      }
-
+  
   p->x = 0;
   p->y = 0;
 

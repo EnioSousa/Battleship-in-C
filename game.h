@@ -39,5 +39,6 @@ void eat_Extra(void);
 void menuStar();
 void printPlayerInfo(Player* p,Player* p1);
 void printPlayer(Player* p);
-
+int inputCheck();
+char inputCheckChar();
 #endif
