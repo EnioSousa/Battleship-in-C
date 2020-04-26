@@ -1,7 +1,11 @@
 #include "map.h"
-#include "insert.h"
+#include "interface.h"
+#include "error.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-Map* newMap(int size)
+/*-----------------------Initiate--------------------------------*/
+Map* newMap(int size, Ship *ship)
 {  
   Map *m = (Map*)malloc(sizeof(Map));
   if(m==NULL)
@@ -9,9 +13,12 @@ Map* newMap(int size)
   
   m->nPoint = 0;
   m->mapSize = size;
+  
   m->map = newBiArray(size);
 
-  initiateBiArray(m->map,size, WATER);
+  initiateBiArray(m->map, size, WATER);
+
+  m->ship = ship;
   
   return m;
 }
@@ -20,14 +27,16 @@ char** newBiArray(int size)
 {
   char **map = (char**)malloc(size*sizeof(char*));
 
-  if( map == NULL )
+  if ( map == NULL )
     errorMessageMem("newMap");
   
-  for(int i=0; i<size; i++ ){
+  for( int i=0; i<size; i++ )
+    {
       map[i] = (char*)malloc(size*sizeof(char));
+
       if ( map[i] == NULL )
-	  errorMessageMem("newMap");
-     }
+	errorMessageMem("newMap");
+    }
 
   return map;
 }
@@ -35,56 +44,60 @@ char** newBiArray(int size)
 void initiateBiArray(char **map, int size, char ch)
 {
   for( int i=0; i<size; i++ )
-    for( int j=0; j<size; map[i][j]=ch,j++);
+    for( int j=0; j<size; j++)
+      map[i][j]=ch;
 }
 
-void errorMessageMem(char *str)
+/*-----------------------Search-----------------------------------*/
+
+char search(Map *m, Point *p)
 {
-  fprintf(stderr, "Memory allocation failed on %s\n", str);
-  exit(EXIT_FAILURE);
+  if (!inBound(m,p) )
+    errorMessageOut("search", p);
+
+  return m->map[p->y-1][p->x-1];
+}
+
+int inBound(Map *m, Point *p)
+{
+  int lim = m->mapSize;
+
+  return p->x <= lim && p->x > 0 && p->y <= lim && p->y > 0 ? 1: 0;
 }
 
 
-int search(Map *m,Point *p)
-{
-  if(insideOfMap(m,p)){
-   if(m->map[p->y-1][p->x-1] == 'H' || m->map[p->y-1][p->x-1] == WATER )
-    return 0;
-  }
-  else
-  return 1;
-}
+/*-----------------------Print-----------------------------------*/
 
-void deleteAll(Map *m)
-{
-  for(int i=0;i<m->mapSize; i++)
-    for(int j=0;j<m->mapSize; m->map[i][j]=WATER, j++ );
 
-  m->nPoint = 0;
-}
-
-void deletePoint(Map *m, Point *p)
-{
-  if ( !insideOfMap(m,p) )
-    return;
-
-  if ( m->map[p->y-1][p->x-1] != WATER )
-    m->nPoint--;
+void printMap(Map *m,int u){ 
   
-  m->map[p->y-1][p->x-1] = WATER;
+  for(int i=m->mapSize-1; i>=0; putchar('\n'), i--)
+   for(int j=0; j<m->mapSize;j++ ){
+    if(m->map[i][j]=='#')
+    printf(ANSI_COLOR_BLUE "%c "ANSI_COLOR_RESET,m->map[i][j]);
+    else
+    if(m->map[i][j]=='H')
+    printf(ANSI_COLOR_YELLOW "%c "ANSI_COLOR_RESET,m->map[i][j]);
+    else{ 
+    if(u==0)
+    printf(ANSI_COLOR_GREEN"%c "ANSI_COLOR_RESET,m->map[i][j]);
+    else
+    printf(ANSI_COLOR_RED"%c "ANSI_COLOR_RESET,m->map[i][j]);
+    }
+    }
+    
+  putchar('\n');
 }
 
-Point *newPoint()
+void printInfo(Map *m)
 {
-  Point *p = (Point*)malloc(sizeof(Point));
+  printf("Map Size = %d, Num of Points = %d\n", m->mapSize, m->nPoint);
 
-  if ( p==NULL ){
-      errorMessageMem("Point");
-     }
-  
-  p->x = 0;
-  p->y = 0;
-
-  return p;
+  putchar('\n');
 }
+
+
+
+
+
 

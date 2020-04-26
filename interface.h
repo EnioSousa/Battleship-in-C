@@ -1,10 +1,10 @@
 #ifndef INTERFACE
 #define INTERFACE
+
 #include "map.h"
-#include "ship.h"
-#include "game.h"
-#include <unistd.h>
-//cores em ANSI utilizadas 
+
+//used ANSI colors 
+
 #define ANSI_COLOR_RED     	"\x1b[31m" 
 #define ANSI_COLOR_GRAY    	"\e[0;37m"
 #define ANSI_COLOR_DARK_GRAY 	"\e[1;30m"
@@ -14,27 +14,17 @@
 #define ANSI_COLOR_BLUE "\e[0;34m"
 
 
-void printAll(Map *);
-void printInfo(Map *);
-void printMap(Map *);
-void printPoint(Point *);
+/*-----------------------Clear terminal ---------------------------------*/
 void clearTerminal();
-void printRepeat(int n, char ch);
-void flush_in();
-void printMaphis(Map *m);
+/*------------------------Images------------------------------------------*/
+void menuStar();
 void winMeme();
-void finalGame(char* str);
-void information();
-void wait();
-void waitLong();
-void temporyPrint();
-int  checkDir(char dir);
-void printMap2(Map* map);
-void printCarrier();
-void printBattleship();
-void printCruiser();
-void printSubmarine();
-void printDestroyer();
-void printfActive(Map* map);
-void informationShip(Ship* s);
+void inicGame(char *str,int i);
+/*-------------------------Wait------------------------------------------*/
+void waitS(int i);
+/*----------------------Information--------------------------------------*/
+void directionHelpPrint();
+/*---------------------------Ask------------------------------------------*/
+int  askContinue();
 #endif
+

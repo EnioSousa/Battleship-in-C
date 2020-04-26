@@ -1,44 +1,26 @@
 #ifndef GAME
 #define GAME
-#include "interface.h"
-#include "insert.h"
-#include "ship.h"
-#include "map.h"
-#include <time.h>
-#define maxNameSize 60
-#define Npoints  30
+#define TOTALPOINTS 27
+#include "player.h"
+#include "point.h"
 
 
-typedef struct 
-{
-  char *name;
-  Map *map, *his;
-  int nhit;
-  Ship *ship;
-  
-}Player;
 
-
-Player *initiatePlayer(int);
-int defineSize();
-char *getName();
-int minBattlefieldSize(int size);
-void askForMap(char *, Map *, Ship *,int i);
-void game(Player *p1, Player *p2,int size);
-Point* askPoint(Point* p,int size);
-int checkWin(Player* p1);
-void clearGame(Player* p1,Player* p2);
-int checkShoot(Point* p, Player* p1,Player* p2);
-int checkPoint(Point* p, int size);
+/*-------------------Game----------------------------------------*/
+ void game(Player *p1, Player *p2,int size);
+/*-------------------Define Board---------------------------------------*/
 int defineBattlefieldSize();
-int askContinue();
+int defineSize();
+int minBattlefieldSize(int size);
+/*-------------------Check----------------------------------------*/
+int checkShoot(Point* p, Player* p1,Player* p2);
+int checkWin(Player* p1);
+int checkPoint(Point* p,int size);
+/*--------------------Ask-------------------------------------------*/
+Point* askPoint(Point* p,int size);
+void askForMap(Map* map);
+/*-------------------Clear board game -----------------------*/
+void clearGame(Player* p1,Player* p2);
+/*-------------------------Restart game------------------------------*/
 void restartGame(Player* p1,Player* p2);
-void clearMemory(Player* p1,int size);
-void clearMemoryMap(Map* p1,int size);
-void eat_Extra(void);
-void menuStar();
-void printPlayerInfo(Player* p,Player* p1);
-void printPlayer(Player* p);
-int inputCheck();
-char inputCheckChar();
-#endif
+#endif 

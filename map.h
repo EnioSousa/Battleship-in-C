@@ -1,30 +1,28 @@
-#ifndef MAP_WORLD
-#define MAP_WORLD
-#include <stdio.h>
-#include <stdlib.h>
-#define WATER '#' 
+#ifndef MAP
+#define MAP
 
-typedef struct Point 
-{ 
-  int x; 
-  int y;
-} Point;
+#define WATER '#' 
+#define HIT 'H'
+
+#include "ship.h"
+#include "point.h"
 
 typedef struct 
 {
   char **map;
+  Ship *ship;
   int nPoint, mapSize;
   
 }Map;
 
-
-Map* newMap(int);
+/*-----------------------Initiate--------------------------------*/
+Map* newMap(int, Ship *);
 char** newBiArray(int);
 void initiateBiArray(char **, int, char);
-void errorMessageMem(char*);
-int search(Map *, Point *);
-void deleteAll(Map *);
-void deletePoint(Map *, Point *);
-void printPoint(Point *);
-Point *newPoint();
+/*-----------------------Search-----------------------------------*/
+char search(Map *, Point *);
+int inBound(Map *, Point *);
+/*-----------------------Print-----------------------------------*/
+void printMap(Map *m,int i);
+void printInfo(Map *m);
 #endif

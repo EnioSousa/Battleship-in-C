@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-I.
-DEPS = game.h interface.h insert.h map.h ship.h
-OBJ = game.o interface.o insert.o map.o ship.o
+DEPS = point.h error.h ship.h interface.h map.h insertDelete.h input.h player.h game.h clearMemory.h playGame.h
+OBJ = point.o error.o ship.o interface.o map.o insertDelete.o input.o player.o  game.o clearMemory.o playGame.o 
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)

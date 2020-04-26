@@ -1,28 +1,36 @@
 #ifndef SHIP
 #define SHIP
-#include <string.h>
-#include "map.h"
+
+#include "point.h"
+
+
 /* Numero de navios diferentes */
 #define NumDifShip 5
 
-/* 
-   Name -> nome do navio
-   Size -> tamanho que o navio ocupa
-   Num -> numero de navios a serem colocados
-   Left -> numero de navios que falta ser posto
+/* name -> nome do navio
+   id -> identificação numerica do navio
+   size -> tamanho que o navio ocupa
+   num -> numero de navios
+   left -> numero de navios que falta ser posto
+   active -> numero de navios ativos
    vec -> vetor de deslocação
 */
 
-typedef struct ship
-{
+typedef struct ship {
   char name[20];
-  int size,num,left,id;
-  Point *vec;
-  
-}Ship;
+  int size, num, left, id, active;
+  Point* vec;
+ }Ship;
 
-
+/*-----------------------Initiate--------------------------*/
 Ship* initiateShip();
 void defineForm(Ship *);
+
+/*-------------------------Print--------------------------*/
+void printAllShip(Ship *);
 void printShip(Ship *);
+void printShipForm(Ship *);
+void printShipInfo(Ship *);
+void informationShipRemaining(Ship* );
+void PrintShipName(Ship* ,int );
 #endif
