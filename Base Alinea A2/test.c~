@@ -1,0 +1,14 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "point.h"
+#include "ship.h"
+#include "map.h"
+
+#define size 10
+
+int main()
+{
+  
+  return 0;
+}
