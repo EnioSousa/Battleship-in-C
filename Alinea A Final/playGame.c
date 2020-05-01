@@ -16,6 +16,7 @@ int main()
     printf(ANSI_COLOR_GREEN "Player 2\n" ANSI_COLOR_RESET);
     Player *p2 = initiatePlayer(size, i);
     waitS(0);
+    clearTerminal();
     game(p1, p2, size);
     endGame = askContinue();
     i = 1;
