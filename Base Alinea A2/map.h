@@ -34,4 +34,6 @@ Cell **newBiCell(int size);
 
 int lost(Map *map);
 
+void freeMap(Map *map);
+
 #endif

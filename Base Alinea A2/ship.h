@@ -31,6 +31,9 @@ typedef struct ship
 Ship* initiateShip(int nShips);
 void defineForm(Ship *ship);
 
+/*-------------------------Free---------------------------*/
+void freeShip(Ship *ship);
+
 /*-------------------------Check--------------------------*/
 int someShipLeft(Ship *ship);
 int shipAvaliable(Ship *ship);

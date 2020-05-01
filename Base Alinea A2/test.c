@@ -18,19 +18,24 @@ int main()
   insertRandom(map1);
   insertRandom(map2);
 
-  Point p;
+  freeMap(map1);
+  freeMap(map2);
 
-  printf("FUCK %d\n",  lost(map2));
-  while ( !lost(map2) )
-    {
-      printAll(map1);
-      printAllShipInfo(map1->ship);
-      printAll(map2);
-      printAllShipInfo(map2->ship);
+  printShipInfo(map1->ship);
 
-      scanf("%d %d", &p.x, &p.y);
-      shot(map1, map2, &p);
-    }
+  /* Point p; */
+
+  /* printf("FUCK %d\n",  lost(map2)); */
+  /* while ( !lost(map2) ) */
+  /*   { */
+  /*     printAll(map1); */
+  /*     printAllShipInfo(map1->ship); */
+  /*     printAll(map2); */
+  /*     printAllShipInfo(map2->ship); */
+
+  /*     scanf("%d %d", &p.x, &p.y); */
+  /*     shot(map1, map2, &p); */
+  /*   } */
   
   return 0;
 }

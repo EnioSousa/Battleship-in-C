@@ -48,7 +48,16 @@ void defineForm(Ship *ship)
   ship[0].vec[4].y = 1;
 }
 
+/*-------------------------Free---------------------------*/
+void freeShip(Ship *ship)
+{
+  for( int i=0; i<NumDifShip; i++ )
+    free(ship[i].vec);
 
+  free(ship);
+}
+
+/*-------------------------Check--------------------------*/
 int someShipLeft(Ship *ship)
 {
   if ( ship==NULL )

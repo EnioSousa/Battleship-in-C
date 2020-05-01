@@ -49,3 +49,23 @@ int lost(Map *map)
 {
   return someActiveShip(map->ship) ? 0: 1;
 }
+
+void freeMap(Map *map)
+{
+  if ( map==NULL )
+    return;
+  
+  for( int i=0; i<map->mapSize; i++ )
+    {
+      free(map->board[i]);
+      map->board[i]=NULL;
+    }
+  
+  free(map->board);
+  map->board=NULL;
+
+  freeShip(map->ship);
+  map->ship=NULL;
+
+  free(map);
+}
