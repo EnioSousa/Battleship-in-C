@@ -44,3 +44,8 @@ Cell **newBiCell(int size)
 
   return biArr;
 }
+
+int lost(Map *map)
+{
+  return someActiveShip(map->ship) ? 0: 1;
+}

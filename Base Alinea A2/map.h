@@ -32,5 +32,6 @@ Map *newMap(int size);
 Cell *newCell(int size);
 Cell **newBiCell(int size);
 
+int lost(Map *map);
 
 #endif

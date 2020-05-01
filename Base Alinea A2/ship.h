@@ -35,11 +35,13 @@ void defineForm(Ship *ship);
 int someShipLeft(Ship *ship);
 int shipAvaliable(Ship *ship);
 int nextShip(Ship *ship);
+int someActiveShip(Ship *ship);
 
 /*-------------------------Print--------------------------*/
 void printAllShip(Ship *);
 void printShip(Ship *);
 void printShipForm(Ship *);
+void printAllShipInfo(Ship *ship);
 void printShipInfo(Ship *);
 
 #endif

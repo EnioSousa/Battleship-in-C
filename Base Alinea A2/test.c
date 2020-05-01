@@ -11,17 +11,26 @@
 #define size 10
 
 int main()
-{
-  srand(time(NULL));
-  
-  Map *map1 = newMap(20);
-  Map *map2 = newMap(40);
+{  
+  Map *map1 = newMap(10);
+  Map *map2 = newMap(10);
 
   insertRandom(map1);
   insertRandom(map2);
 
-  printAll(map1);
-  printAll(map2);
+  Point p;
+
+  printf("FUCK %d\n",  lost(map2));
+  while ( !lost(map2) )
+    {
+      printAll(map1);
+      printAllShipInfo(map1->ship);
+      printAll(map2);
+      printAllShipInfo(map2->ship);
+
+      scanf("%d %d", &p.x, &p.y);
+      shot(map1, map2, &p);
+    }
   
   return 0;
 }

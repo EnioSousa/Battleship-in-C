@@ -24,6 +24,8 @@ int findSomeDir(Map *m, Ship *ship, Point *p, char *dir);
 void insertShip(Map *m, Ship *ship, Point *ref, char dir);
 void insertPoint(Map *m, Point *p, Ship *ship);
 int shot(Map *map1, Map *map2, Point *p);
+int sunk(Map *map, Point *p);
+int testCondition(Map *m, Point *p);
 
 /*----------------------------Check-------------------------------*/
 int placeIsPossible(Map *m, Ship *ship, Point *p, char dir);

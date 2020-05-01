@@ -86,9 +86,11 @@ int shot(Map *map1, Map *map2, Point *p)
 {
   int x = p->x-1, y = p->y - 1;
   
-  if ( search(map2, p)==NULL )
+  if (  map2->board[y][x].bit!='1' )
     {
       map1->board[y][x].shot = '1';
+
+      if ( map2->board[y][x].bit!='2' )
       map2->board[y][x].bit = '3';
 
       return 0;
@@ -96,13 +98,55 @@ int shot(Map *map1, Map *map2, Point *p)
 
   else
     {
+      Ship *ship = search(map2, p);
+  
       map1->board[y][x].shot = '2';
       map2->board[y][x].bit = '2';
 
+      if ( sunk(map2, p) )
+	ship->active--;
+      
       return 1;
     }
 }
 
+int sunk(Map *map, Point *p)
+{
+  Point vec, p1;
+  vec.x = 1; vec.y = 0;
+
+  int cond;
+
+  char saveBit = map->board[p->y-1][p->x-1].bit;
+  map->board[p->y-1][p->x-1].bit = '4';
+  
+  movePointInDir(p, &vec, &p1, 'e');
+  cond = testCondition(map, &p1);
+
+  movePointInDir(p, &vec, &p1, 'n');
+  cond = cond && testCondition(map, &p1);
+
+  movePointInDir(p, &vec, &p1, 'w');
+  cond = cond && testCondition(map, &p1);
+
+  movePointInDir(p, &vec, &p1, 's');
+  cond = cond && testCondition(map, &p1);
+
+  
+  map->board[p->y-1][p->x-1].bit = saveBit;
+
+  return cond;  
+}
+
+int testCondition(Map *map, Point *p)
+{
+  if ( !inBound(map, p) )
+    return 1;
+  
+  int testBit = map->board[p->y-1][p->x-1].bit;
+  
+  return testBit=='0' || testBit=='3' || testBit=='4' ? 1: (testBit=='1' ? 0: sunk(map, p));
+}
 
 /*----------------------------Check-------------------------------*/
 int placeIsPossible(Map *m, Ship *ship, Point *p, char dir)

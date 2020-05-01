@@ -72,6 +72,15 @@ int nextShip(Ship *ship)
   return -1;
 }
 
+int someActiveShip(Ship *ship)
+{
+  for( int i=0; i<NumDifShip; i++ )
+    if ( ship[i].active )
+      return 1;
+
+  return 0;
+}
+
 /*-------------------------Print--------------------------*/
 void printAllShip(Ship *arr)
 {  
@@ -86,6 +95,12 @@ void printShip(Ship *ship)
   printShipForm(ship);
 
   putchar('\n');  
+}
+
+void printAllShipInfo(Ship *ship)
+{
+  for( int i=0; i<NumDifShip; i++ )
+    printShipInfo(&ship[i]);
 }
 
 void printShipInfo(Ship* ship)
