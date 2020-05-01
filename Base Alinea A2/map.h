@@ -3,7 +3,6 @@
 
 #include "ship.h"
 
-
 typedef struct Cell
 {
   Ship *ship;
@@ -11,18 +10,18 @@ typedef struct Cell
   char shot;
 
   char bit;
-  
-}Cell;
 
-typedef struct 
+} Cell;
+
+typedef struct
 {
   Cell **board;
 
   Ship *ship;
-  
+
   int nPoint, mapSize;
-  
-}Map;
+
+} Map;
 
 /*-----------------------Initiate--------------------------*/
 

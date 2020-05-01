@@ -11,4 +11,3 @@ int inBound(Map *map, Point *p);
 
 #endif
 
-

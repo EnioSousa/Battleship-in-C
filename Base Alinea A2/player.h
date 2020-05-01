@@ -4,17 +4,15 @@
 #include "map.h"
 #include "ship.h"
 
-typedef struct 
+typedef struct
 {
   char *name;
   Map *map;
- }Player;
+} Player;
 
 /*-----------------------Initiate--------------------------------*/
-Player *initiatePlayer(int,int);
+Player *initiatePlayer(int, int);
 /*-----------------------Print-----------------------------------*/
-void printPlayer(Player* p);
+void printPlayer(Player *p);
 
 #endif
-
-

@@ -3,8 +3,7 @@
 
 #include "point.h"
 
-
-void errorMessageMem(char* s);
-void errorMessageOut(char* s, Point* p);
-void errorMessageMap(char* s);
+void errorMessageMem(char *s);
+void errorMessageOut(char *s, Point *p);
+void errorMessageMap(char *s);
 #endif

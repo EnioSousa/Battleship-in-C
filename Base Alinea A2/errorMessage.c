@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
 void errorMessageMem(char *str)
 {
   fprintf(stderr, "Memory allocation failed on %s\n", str);

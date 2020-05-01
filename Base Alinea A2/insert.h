@@ -5,15 +5,14 @@
 #include "ship.h"
 #include "point.h"
 
-
 /*----------------------Insert Manual-------------------------*/
 void insertManual(Map *m);
-  
+
 /*----------------------Insert Random-----------------------*/
 void insertRandom(Map *m);
 void findSomePlace(Map *m, Ship *ship, Point *p, char *dir);
 int findSomeDir(Map *m, Ship *ship, Point *p, char *dir);
-  
+
 /*----------------------Insert Ship/Point-----------------------*/
 void insertShip(Map *m, Ship *ship, Point *ref, char dir);
 void insertPoint(Map *m, Point *p, Ship *ship);

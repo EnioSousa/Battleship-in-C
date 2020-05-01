@@ -3,7 +3,6 @@
 
 #include "point.h"
 
-
 /* Numero de navios diferentes */
 #define NumDifShip 5
 
@@ -18,15 +17,15 @@
 typedef struct ship
 {
   char name[20];
-  
+
   int size, num, left, id, active;
-  
+
   Point *vec;
-  
-}Ship;
+
+} Ship;
 
 /*-----------------------Initiate--------------------------*/
-Ship* initiateShip(int nShips);
+Ship *initiateShip(int nShips);
 void defineForm(Ship *ship);
 
 /*-------------------------Check--------------------------*/
@@ -35,7 +34,7 @@ int shipAvaliable(Ship *ship);
 int nextShip(Ship *ship);
 int someActiveShip(Ship *ship);
 void printAllShipInfo(Ship *ship);
-void informationShipRemaining(Ship* s);
+void informationShipRemaining(Ship *s);
 
 /*-------------------------Print--------------------------*/
 void printAllShip(Ship *);

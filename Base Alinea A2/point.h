@@ -1,19 +1,15 @@
 #ifndef POINT
 #define POINT
 
-#include "errorMessage.h"
-
 typedef struct Point
-{ 
-  int x; 
-  int y;
-  
+{
+    int x;
+    int y;
+
 } Point;
 
 /*-----------------------Initiate--------------------------------*/
-Point* newPoint();
-
+Point *newPoint();
 /*-----------------------Print-----------------------------------*/
-void printPoint(Point* p);
-
+void printPoint(Point *p);
 #endif
