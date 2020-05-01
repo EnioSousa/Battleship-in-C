@@ -124,7 +124,7 @@ int defineBattlefieldSize()
 int minBattlefieldSize(int size)
 {
 
-  if (size >= 10 && size <= 10)
+  if (size >= 20 && size <= 40)
     return 1;
   return 0;
 }

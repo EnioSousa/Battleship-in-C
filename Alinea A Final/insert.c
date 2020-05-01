@@ -69,7 +69,7 @@ void insertManual(Map *m)
     else
     {
       printf("\nCannot place the ship\n");
-      waitS(0);
+      waitS(1);
     }
   }
 }
