@@ -1,14 +1,10 @@
-#ifndef ERRORMESSAGE
-#define ERRORMESSAGE
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef ERROR
+#define ERROR
 
 #include "point.h"
 
-void errorMessageMem(char *);
-void errorMessageOut(char *, Point *);
-void errorMessageMap(char *);
 
+void errorMessageMem(char* s);
+void errorMessageOut(char* s, Point* p);
+void errorMessageMap(char* s);
 #endif

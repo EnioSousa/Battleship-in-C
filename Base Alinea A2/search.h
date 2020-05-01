@@ -2,12 +2,13 @@
 #define SEARCH
 
 #include "map.h"
-#include "ship.h"
 #include "point.h"
-#include "errorMessage.h"
 
-
+/*-------------------Search----------------------------------------*/
 Ship *search(Map *map, Point *p);
+/*-------------------Check----------------------------------------*/
 int inBound(Map *map, Point *p);
 
 #endif
+
+

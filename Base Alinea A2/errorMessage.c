@@ -1,4 +1,8 @@
 #include "errorMessage.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+
 
 void errorMessageMem(char *str)
 {

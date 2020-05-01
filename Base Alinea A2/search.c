@@ -1,5 +1,9 @@
 #include "search.h"
+#include "errorMessage.h"
+#include "ship.h"
+#include <stdio.h>
 
+/*-------------------Search----------------------------------------*/
 Ship *search(Map *map, Point *p)
 {
   if ( !inBound(map, p) )
@@ -8,6 +12,7 @@ Ship *search(Map *map, Point *p)
   return map->board[p->y-1][p->x-1].ship;
 }
 
+/*-------------------Check----------------------------------------*/
 int inBound(Map *map, Point *p)
 {
   int lim = map->mapSize;

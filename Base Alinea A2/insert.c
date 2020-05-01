@@ -1,25 +1,69 @@
 #include "insert.h"
+#include "search.h"
+#include "interface.h"
+#include "errorMessage.h"
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "input.h"
 
 
 /*----------------------Insert Manual-------------------------*/
+
 void insertManual(Map *m)
 {
-  int id;
+  int id,x,y;
+  int checkId;
+  int checkDir;
   char dir;
   Point p;
 
-  if ( m->ship==NULL )
-    errorMessageMap("insertManual");
+  if(m->ship==NULL)
+  errorMessageMap("insertManual");
   
-  while ( someShipLeft(m->ship) )
-    {
-      scanf("%d %d %d %c", &id, &p.x, &p.y, &dir);
-
-      if( placeIsPossible(m, &m->ship[id], &p, dir) )
-	insertShip(m, &m->ship[id], &p, dir);
-      
-      else
-	printf("Cannot place the ship\n");
+   while (someShipLeft(m->ship) ){ 
+   checkId=1,checkDir=1;
+   clearTerminal();
+   printf(ANSI_COLOR_YELLOW "Manual\n\n"ANSI_COLOR_RESET);
+   informationShipRemaining(m->ship);  
+   printMapShip(m);
+   printf(ANSI_COLOR_GREEN "Ship identification\n");   
+   while(checkId){
+   id=inputCheck();
+   if(id>=0 && id<5){
+   if(m->ship[id].left!=0) 
+   checkId=0;
+   else printf("There are no more ships \n");  
+   }
+   else
+   printf("invalid id\n");
+   }
+   printf("X coordinate\n");
+   x=inputCheck();
+   printf("Y coordinate\n");
+   y=inputCheck();
+   if(id==4)
+   dir='n'; 
+   else{
+   printf("The direction of the ship\n");
+   directionHelpPrint();
+   while(checkDir){
+   dir=inputCheckChar();
+   if(dir=='n'||dir=='e'||dir=='w'||dir=='s')
+   checkDir=0;
+   else
+   printf("invalid direction\n"ANSI_COLOR_RESET);
+   }
+   }
+    p.x=x; p.y=y;
+    if( placeIsPossible(m,&m->ship[id], &p, dir) )
+	{
+	  insertShip(m, &m->ship[id], &p, dir);
+	}
+    else{
+	printf("\nCannot place the ship\n");
+	waitS(1);
+	}
     }
 }
 
@@ -82,7 +126,7 @@ void insertPoint(Map *map, Point *p, Ship *ship)
   map->nPoint++;
 }
 
-int shot(Map *map1, Map *map2, Point *p)
+int shoot(Map *map1, Map *map2, Point *p)
 {
   int x = p->x-1, y = p->y - 1;
   
