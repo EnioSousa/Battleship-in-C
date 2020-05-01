@@ -181,16 +181,14 @@ void inicGame(char *str, int i)
 
 void waitS(int i)
 {
+
+  printf(ANSI_COLOR_RED "\nwait a few seconds\n" ANSI_COLOR_RESET);
+
   if (i == 0)
-  {
-    printf(ANSI_COLOR_RED "\nPress any key \n" ANSI_COLOR_RESET);
-    getchar();
-  }
-  else if (i != 0)
-  {
-    printf(ANSI_COLOR_RED "\nwait a few seconds\n" ANSI_COLOR_RESET);
+    sleep(3);
+  else
     sleep(1);
-  }
+
   clearTerminal();
 }
 
