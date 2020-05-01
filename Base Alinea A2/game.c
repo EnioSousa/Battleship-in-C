@@ -22,7 +22,6 @@ void game(Player* p1, Player* p2,int size){
 	   
 	   while(cycleSecond){
 	   if(f==1){
-	   //printPlayer(turn);
 	   printMapHistory(turn->map);
 	   }
 	   f=0;
@@ -31,7 +30,7 @@ void game(Player* p1, Player* p2,int size){
 	   if(cycleFirst!=99)
 	   cycleSecond=0;  
 	   else{
-	   waitS();
+	   waitS(1);
 	   clearTerminal();
 	   f=1;
 	   }
@@ -70,8 +69,8 @@ int checkShoot(Point* p, Player* p1,Player* p2){
 	 
 	 if(shoot(p1->map,p2->map,p)==0){
      printf(ANSI_COLOR_RED"Didn't hit the ship\n"ANSI_COLOR_RESET);
-     waitS();
-	 return 1;
+     waitS(1);
+     return 1;
      }
 	 else{
 	 printf(ANSI_COLOR_GREEN"Hit the ship\n"ANSI_COLOR_RESET);

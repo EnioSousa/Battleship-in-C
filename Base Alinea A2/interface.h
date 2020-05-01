@@ -23,7 +23,7 @@ void menuStar();
 void winMeme();
 void inicGame(char *str,int i);
 /*-------------------------Wait------------------------------------------*/
-void waitS();
+void waitS(int i);
 /*----------------------Information--------------------------------------*/
 void directionHelpPrint();
 /*---------------------------Ask------------------------------------------*/
