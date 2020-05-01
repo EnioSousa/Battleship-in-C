@@ -36,9 +36,10 @@ void printMapShip(Map *m)
       if(m->board[i][j].bit=='1')
       printf(ANSI_COLOR_GREEN "%c "ANSI_COLOR_RESET,m->board[i][j].bit );
       else
-      if(m->board[i][j].shot=='2')
+      if(m->board[i][j].bit=='2')
       printf(ANSI_COLOR_RED "%c "ANSI_COLOR_RESET,m->board[i][j].bit );
       else
+      if(m->board[i][j].bit=='3')
       printf(ANSI_COLOR_YELLOW "%c "ANSI_COLOR_RESET,m->board[i][j].bit );
 
   putchar('\n');
@@ -157,7 +158,7 @@ void winMeme(){
     printf(ANSI_COLOR_YELLOW"  ░║╚╝░╚═╝░░║░░░░░░╚═╝░║░║░╩═╝░\n"ANSI_COLOR_RESET);
     printf(ANSI_COLOR_YELLOW"  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n"ANSI_COLOR_RESET); 
 
-   waitS(4);
+   waitS(0);
    clearTerminal();
 }
 
@@ -182,15 +183,22 @@ void inicGame(char *str,int i){
   printf("  Hello %s \n Welcome to the game of naval battle.\n We will continue with a brief tutorial on the game pieces.\n Good luck.      \n",str);
   else
   printf("	   Congratulations you are the winner: %s     \n",str);
-  waitS(5);
+  waitS(0);
 
 }
 
 /*-----------------------wait---------------------------------*/
 
-void waitS(){
+void waitS(int i){
+	if(i==0){
 	printf(ANSI_COLOR_RED "\nPress any key \n"ANSI_COLOR_RESET);
-    getchar(); 
+    getchar();
+    }
+    else
+    if(i!=0){
+	printf(ANSI_COLOR_RED "\nwait a few seconds\n"ANSI_COLOR_RESET);
+    sleep(1);
+    }
     clearTerminal();
 }
 
@@ -204,6 +212,7 @@ int askContinue(){
 	printf(ANSI_COLOR_YELLOW"Yes --> press y or No--> press any key  \n"ANSI_COLOR_RESET);
 	char ch = getchar();
     getchar();
+    clearTerminal();
     if ( ch=='y' )
     return 1;
     else

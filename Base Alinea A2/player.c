@@ -20,9 +20,8 @@ Player *initiatePlayer(int size,int i)
   inicGame(p->name,0);
   if(i==0){
   printAllShip(p->map->ship);
+  waitS(0);
   }
-  waitS();
-  clearTerminal();
   askForMap(p->map);
   printPlayer(p);
   return p;     
@@ -35,8 +34,6 @@ void printPlayer(Player *p)
   printf(ANSI_COLOR_YELLOW"Player: %s\n"ANSI_COLOR_RESET, p->name);
   printf(ANSI_COLOR_GREEN"Your Ships\n"ANSI_COLOR_RESET);
   printMapShip(p->map);
-  waitS();
-  clearTerminal();
   printf(ANSI_COLOR_GREEN"You history of atacks\n"ANSI_COLOR_RESET);
   printMapHistory(p->map);
   

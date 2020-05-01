@@ -11,7 +11,7 @@
  
 int inputCheck(){
 	char x[10];
-	int i=1,v;
+	int i=1,v,a=0;
 	
 	while(i){
 	if(fgets(x,10, stdin)) { 
@@ -23,10 +23,14 @@ int inputCheck(){
         if (!isdigit(x[j]))
         {   
 			printf ("Entered input is not a number\n");
+			a++;
             break;
         }
-        else
-        i=0;
+    
+    if(a==0)
+    i=0;
+    else
+    a=0;
     }
      v=atoi(x);
     return v;
@@ -55,15 +59,16 @@ char inputCheckChar(int r){
 char *getName()
 { 
   char *str = (char*)malloc(maxNameSize*sizeof(char));
-  if(str==NULL)
+  if(str==NULL){
   errorMessageMem("name player");
-  
+  return NULL;
+}
   printf(ANSI_COLOR_RED"Your name please \n"ANSI_COLOR_RESET);
   if(fgets(str,maxNameSize, stdin)) { 
     if (NULL == strchr(str, '\n'))
-     eat_Extra(); 
-     return strdup(str); 
+     eat_Extra();
      }
+      return strdup(str); 
 }
 
 /*-----------------------Auxiliary functions------------------------- */
