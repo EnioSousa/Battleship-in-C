@@ -1,4 +1,10 @@
 #include "map.h"
+#include "errorMessage.h"
+#include "point.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+/*-----------------------Initiate--------------------------*/
 
 Map *newMap(int size)
 {
@@ -45,11 +51,14 @@ Cell **newBiCell(int size)
   return biArr;
 }
 
+
+/*----------------------Check if lost--------------------------*/
 int lost(Map *map)
 {
   return someActiveShip(map->ship) ? 0: 1;
 }
 
+/*----------------------Free-----------------------------------*/
 void freeMap(Map *map)
 {
   if ( map==NULL )

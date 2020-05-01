@@ -1,16 +1,10 @@
 #ifndef INSERT
 #define INSERT
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "map.h"
 #include "ship.h"
 #include "point.h"
-#include "search.h"
-#include "interface.h"
-#include "errorMessage.h"
+
 
 /*----------------------Insert Manual-------------------------*/
 void insertManual(Map *m);
@@ -23,7 +17,7 @@ int findSomeDir(Map *m, Ship *ship, Point *p, char *dir);
 /*----------------------Insert Ship/Point-----------------------*/
 void insertShip(Map *m, Ship *ship, Point *ref, char dir);
 void insertPoint(Map *m, Point *p, Ship *ship);
-int shot(Map *map1, Map *map2, Point *p);
+int shoot(Map *map1, Map *map2, Point *p);
 int sunk(Map *map, Point *p);
 int testCondition(Map *m, Point *p);
 

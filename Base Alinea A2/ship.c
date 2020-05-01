@@ -1,6 +1,12 @@
 #include "ship.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "errorMessage.h"
+#include <string.h>
+#include "interface.h"
 
 /*-----------------------Initiate--------------------------*/
+
 Ship* initiateShip(int nShips)
 {
   Ship *arr= (Ship*)malloc(5*sizeof(Ship));
@@ -48,16 +54,8 @@ void defineForm(Ship *ship)
   ship[0].vec[4].y = 1;
 }
 
-/*-------------------------Free---------------------------*/
-void freeShip(Ship *ship)
-{
-  for( int i=0; i<NumDifShip; i++ )
-    free(ship[i].vec);
-
-  free(ship);
-}
-
 /*-------------------------Check--------------------------*/
+
 int someShipLeft(Ship *ship)
 {
   if ( ship==NULL )
@@ -81,6 +79,7 @@ int nextShip(Ship *ship)
   return -1;
 }
 
+
 int someActiveShip(Ship *ship)
 {
   for( int i=0; i<NumDifShip; i++ )
@@ -90,9 +89,34 @@ int someActiveShip(Ship *ship)
   return 0;
 }
 
+
 /*-------------------------Print--------------------------*/
+
+void informationShipRemaining(Ship* s){
+	
+	printf("Number of ships remaining:\n");
+	if(s[0].left!=0)
+	printf(ANSI_COLOR_YELLOW"Id:0 -->Carrier: %d \n",s[0].left);
+	if(s[1].left!=0)
+	printf("Id:1 -->Battleship: %d \n",s[1].left);
+	if(s[2].left!=0)
+	printf("Id:2 -->Cruiser: %d \n",s[2].left);
+	if(s[3].left!=0)
+	printf("Id:3 -->Submarine: %d \n",s[3].left);
+	if(s[4].left!=0)
+	printf("Id:4 -->Destroyer: %d \n"ANSI_COLOR_RESET,s[4].left);
+    printf("\n");
+}
+
+void printAllShipInfo(Ship *ship)
+{
+  for( int i=0; i<NumDifShip; i++ )
+    printShipInfo(&ship[i]);
+}
+
 void printAllShip(Ship *arr)
 {  
+  printf(ANSI_COLOR_RED "Information\n\n"ANSI_COLOR_RESET);
   for( int i=0; i<NumDifShip; i++ )
     printShip(&arr[i]);
 }
@@ -106,17 +130,11 @@ void printShip(Ship *ship)
   putchar('\n');  
 }
 
-void printAllShipInfo(Ship *ship)
-{
-  for( int i=0; i<NumDifShip; i++ )
-    printShipInfo(&ship[i]);
-}
-
 void printShipInfo(Ship* ship)
 {
-  printf("name=%s, id=%d\n", ship->name, ship->id);
-  printf("size=%d, ", ship->size);
-  printf("Num=%d active=%d\n", ship->num, ship->active);
+  printf(ANSI_COLOR_RED "Name: %s id: %d "ANSI_COLOR_RESET, ship->name, ship->id);
+  printf(ANSI_COLOR_GREEN"Size: %d ", ship->size);
+  printf("Number: %d \n"ANSI_COLOR_RESET , ship->num);
 }
 
 void printShipForm(Ship *ship)
@@ -134,6 +152,18 @@ void printShipForm(Ship *ship)
     
   for( int i=n-1; i>=0; putchar('\n'), i-- )
     for( int j=0; j<n; j++ )
-      printf("%c ", temp[i][j]);
+      if(temp[i][j]=='#')
+      printf(ANSI_COLOR_BLUE"%c"ANSI_COLOR_BLUE, temp[i][j]);
+      else
+      printf(ANSI_COLOR_YELLOW"1"ANSI_COLOR_BLUE);
 }
 
+/*-------------------------Free---------------------------*/
+
+void freeShip(Ship *ship)
+{
+  for( int i=0; i<NumDifShip; i++ )
+    free(ship[i].vec);
+
+  free(ship);
+}

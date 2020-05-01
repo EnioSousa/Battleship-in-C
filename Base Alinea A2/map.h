@@ -1,12 +1,8 @@
 #ifndef MAP_WORLD
 #define MAP_WORLD
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "ship.h"
-#include "errorMessage.h"
-#include "point.h"
+
 
 typedef struct Cell
 {
@@ -28,12 +24,14 @@ typedef struct
   
 }Map;
 
+/*-----------------------Initiate--------------------------*/
+
 Map *newMap(int size);
 Cell *newCell(int size);
 Cell **newBiCell(int size);
-
+/*----------------------Check------------------------------*/
 int lost(Map *map);
-
+/*----------------------Free---------------------------------*/
 void freeMap(Map *map);
 
 #endif
