@@ -6,8 +6,8 @@
 
 void clearMemory(Player* p){
 	
-	free(p->name);
-	freeMap(p->map);
-	free(p);
+  free(p->name);
+  freeMap(p->map);
+  free(p);
 }
 

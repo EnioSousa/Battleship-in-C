@@ -12,22 +12,22 @@ Player *initiatePlayer(int size,int i)
 {
   Player *p = (Player*)malloc(sizeof(Player));
   if(p==NULL)
-  errorMessageMem("player");
+    errorMessageMem("player");
   
   p->map=newMap(size);
   p->name = getName();
   clearTerminal();
   inicGame(p->name,0);
   if(i==0){
-  printAllShip(p->map->ship);
-  waitS(0);
+    printAllShip(p->map->ship);
+    waitS(0);
   }
   askForMap(p->map);
   printPlayer(p);
   return p;     
 }
 
- /*-----------------------Print-----------------------------------*/ 
+/*-----------------------Print-----------------------------------*/ 
 
 void printPlayer(Player *p)
 { 
@@ -37,7 +37,7 @@ void printPlayer(Player *p)
   printf(ANSI_COLOR_GREEN"You history of atacks\n"ANSI_COLOR_RESET);
   printMapHistory(p->map);
   
- }
+}
 
 
 

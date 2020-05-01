@@ -94,18 +94,18 @@ int someActiveShip(Ship *ship)
 
 void informationShipRemaining(Ship* s){
 	
-	printf("Number of ships remaining:\n");
-	if(s[0].left!=0)
-	printf(ANSI_COLOR_YELLOW"Id:0 -->Carrier: %d \n",s[0].left);
-	if(s[1].left!=0)
-	printf("Id:1 -->Battleship: %d \n",s[1].left);
-	if(s[2].left!=0)
-	printf("Id:2 -->Cruiser: %d \n",s[2].left);
-	if(s[3].left!=0)
-	printf("Id:3 -->Submarine: %d \n",s[3].left);
-	if(s[4].left!=0)
-	printf("Id:4 -->Destroyer: %d \n"ANSI_COLOR_RESET,s[4].left);
-    printf("\n");
+  printf("Number of ships remaining:\n");
+  if(s[0].left!=0)
+    printf(ANSI_COLOR_YELLOW"Id:0 -->Carrier: %d \n",s[0].left);
+  if(s[1].left!=0)
+    printf("Id:1 -->Battleship: %d \n",s[1].left);
+  if(s[2].left!=0)
+    printf("Id:2 -->Cruiser: %d \n",s[2].left);
+  if(s[3].left!=0)
+    printf("Id:3 -->Submarine: %d \n",s[3].left);
+  if(s[4].left!=0)
+    printf("Id:4 -->Destroyer: %d \n"ANSI_COLOR_RESET,s[4].left);
+  printf("\n");
 }
 
 void printAllShipInfo(Ship *ship)
@@ -153,9 +153,9 @@ void printShipForm(Ship *ship)
   for( int i=n-1; i>=0; putchar('\n'), i-- )
     for( int j=0; j<n; j++ )
       if(temp[i][j]=='#')
-      printf(ANSI_COLOR_BLUE"%c"ANSI_COLOR_BLUE, temp[i][j]);
+	printf(ANSI_COLOR_BLUE"%c"ANSI_COLOR_BLUE, temp[i][j]);
       else
-      printf(ANSI_COLOR_YELLOW"1"ANSI_COLOR_BLUE);
+	printf(ANSI_COLOR_YELLOW"1"ANSI_COLOR_BLUE);
 }
 
 /*-------------------------Free---------------------------*/
