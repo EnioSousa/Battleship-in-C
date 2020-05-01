@@ -7,18 +7,22 @@ Funções que te vai dar geito. Não aconselho a usares outras funções a menos
 
 Map *newMap(int size); ---> Cria um novo mapa com tamanho size. 
 
-void deletePoint(Map *, Point *p); --> remove o ponto p do mapa. Caso não exista não faz nada
+Ship *search(Map *map, Point *p); ---> Procura o ponto p no mapa e RETORNA o apontador para o ship ou null caso não exista
 
-int *search(Map *, Point *p); ---> Procura o ponto p no mapa e RETORNA 1 caso exista, 0 caso contrario
+void insertManual(Map *map); ---> Insere os barcos manualmente
 
-void insertManual(Map *, Ship *); ---> Insere os barcos manualmente
+void insertRandom(Map *map); ---> Insere os barcos random. Não te esqueças de iniciar a seed
 
-void insertRandom(Map *, Ship*); ---> Insere os barcos random. Não te esqueças de iniciar a seed
+void insertShip(Map *map, Ship *ship, Point *p, char dir); ---> insere um navio, na possição p e coloca o navio em direção a dir
 
-void insertShip(Map *, Ship *, Point *, char ); ---> insere um navio, numa possição
+void insertPoint(Map *map, Point *p, Ship *ship ); ---> insere um ponto no mapa
 
-void insertPoint(Map *, Point *, int ); ---> insere um ponto no mapa
+void printAll(Map *m) --> void printMapShip(Map *m); + void printMapHistory(Map *m);
 
-void printMap(Map *m); ---> faz print do mapa
+void printMapShip(Map *m); ---> faz print das possições dos navios do jogador com mapa m
 
-Ship* initiateShip(); ---> inicia o ship, com as formas que definimos
+void printMapHistory(Map *m); ---> faz print da historia de ataques do jogador com mapa m
+
+Ship* initiateShip(int size); ---> inicia o ship, com as formas que definimos e atribui automaticamente o numero de navios
+
+void printAllShip(Ship *); --> faz print das formas de cada navio
