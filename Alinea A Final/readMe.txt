@@ -1,8 +1,101 @@
-How to compile and run:
+﻿How to compile and run:
 $make clean
 $make
 
+O programa é baseado no jogo da batalha naval jogado por duas pessoas.
+Os jogadores terão de definir o tamanho do mapa que será usado no jogo, o que corresponde a uma matriz quadrada (maior do que 19 e menor do que 41).
+Cada jogador terá de fornecer o seu nickname e escolher o modo de inserir as suas peças referentes aos barcos. Existe dois modos:manual e random. O modo random automaticamente distribui os barcos no mapa. No modo manual, o jogador precisa de inserir manualmente cada barco no mapa. Existe 5 tipos de barcos: Carrier,Battleship,Cruiser,Submarine e o Destroyer.
+No modo manual é pedido a identificação do barco (cada tipo de barco tem uma id que vai de 0 até 4),a coordenada x que corresponde à linha, e a coordenada y que corresponde à coluna. As coordenadas x e y vão de 1 até ao máximo definido pelos jogadores(Não esquecer que é uma matriz quadrada).Pede também a direcção do barco que corresponde a norte,sul,leste e oeste.
+Selecionando um dos modos anteriores o jogo inicia. Cada jogador terá duas matrizes, uma referente à distribuição dos barcos e a outra  ao histórico dos seus disparos ao longo do jogo.
+O jogador precisa de inserir as coordenadas(x e y) do seu tiro. Caso o seu disparo  atinge um barco poderá disparar novamente. Caso contrário passa a vez para outro jogador.As matrizes serão a actualizadas em cada disparo.
+O primeiro que eliminar todos os barcos vence o jogo.
+No fim do jogo poderá reiniciar uma nova partida.
+
+     
+Módulo ClearMemory:
+void clearMemory(Player *p);-->Liberta a memória alocada dinamicamente da função 
+initiatePlayer/2 do módulo Player.
+
+Módulo Point:
+Point *newPoint();-->Cria uma estrutura Point e retorna o seu apontador.
+
+void printPoint(Point *p);-->Imprime as coordenadas x e y
+
+Modulo Interface:
+
+void clearTerminal();-->Limpa a tela da consola usada para executar o jogo. 
+
+void menuStar();-->Imprime uma imagem.
+
+void winMeme();-->Imprime uma imagem.
+
+void inicGame(char *str, int i);-->Imprime uma imagem e uma informação que vai depender da variável i.Ou seja existe duas informações e a variável i vai decidir a escolhida.
+
+void waitS(int i);-->Imprime uma mensagem e dispara a função sleep.A variável i vai decidir qual o parâmetro escolhido para a função sleep(3 ou 1).    
+
+void directionHelpPrint();-->Imprime as possíveis direções para os barcos no mapa (north, east, west e south) a serem escolhidas no insertManual.
+
+
+int askContinue();-->Imprime a pergunta aos jogadores se querem voltar a jogar. É lido a resposta dos jogadores e retorna 1 caso afirmativo ou 0 caso seja negativo.
+void printInfo(Map *);-->Imprime o tamanho da matriz quadrada e o número de pontos utilizados pelos barcos.
+
+void printMapShip(Map *m);-->Imprime a matriz quadrada correpondente a distribuição dos barcos do jogador no mapa. O 0 corresponde ao vazio,1 às peças que constituem os barcos que não foram atingidas,2 às peças atingidas e 3 aos disparos falhados do inimigo.   
+
+void printMapHistory(Map *m);-->Imprime a matriz quadrada correspondente ao histórico dos tiros do jogador no mapa.O 0 corresponde à ausencia de disparos,1  aos disparos falhados e 2 aos disparos nos barcos.   
+
+void printAll(Map *);--> Imprime  as informações contidas  nas funções: printInfo(Map *),void printMapShip(Map *m),void printMapHistory(Map *m).
+
+Modulo Input:
+
+int inputCheck();-->Lê apenas números.Caso contrário dispara uma mensagem e o jogador precisa voltar a inserir um número.
+ 
+char inputCheckChar();-->Lê apenas um caracter.Caso não aconteça é disparada uma mensagem e o jogador terá de voltar inserir.
+  
+char *getName();--->Lê uma string inserida pelo jogador.
+
+void eat_Extra(void);-->É uma função auxiliar do getName().Caso a string inserida ultrapasse o limite de tamanho esta função será usada para eliminar os caracteres excedentes.    
+
+void flush_in();--->Serve para limpar o buffer do teclado
+
+Modulo Player:
+
+Player *initiatePlayer(int size, int i);---> Cria uma estrutura Player.
+Serão usadas as seguintes funções:getName para o nome do jogador,inicGame,AskForMap para escolher o modo de inserção das peças e printPlayer.
+A variável i vai decidir se é executada a função printAllShip com objectivo de servir de um breve tutorial sobre as peças referentes aos barcos.
+E por fim retorna o apontador Player.   
+ 
+void printPlayer(Player *p);--->Imprime duas matrizes correspondente ao histórico dos  tiros e a distribuição dos barcos do Player p.
+
+void game(Player *p1, Player *p2, int size);---> Este função corresponde à mecânica do jogo. Inicialmente p1 começa a jogar escolhendo um ponto no mapa,
+caso tenha atingido uma peça do barco volta a escolher outro ponto,caso contrário passa a vez para o jogador p2.Assim decorre sucessivamente o jogo até um jogador ficar sem peças.É sinalizada a vitória e limpa a memória de p1 e p2.
+         
+int defineBattlefieldSize();-->Define o tamanho do campo de batalha ou seja a matriz usada no printMapShip e no printMapHistory
+
+int defineSize();-->Função auxiliar da função defineBattlefieldSize(),lê o tamanho escolhido pelos jogadores.
+
+int minBattlefieldSize(int size);-->Função auxiliar de defineBattlefieldSize(),verifica se o tamanho está nos limites exigidos pelo programa.  
+
+int checkShoot(Point *p, Player *p1, Player *p2);-->Verfica se o tiro disparado acertou no barco.Com esta informação imprime uma mensagem sobre a situação do tiro.Caso o tiro não atinga o barco, retorna 1. Caso o barco seja atingido existe uma função que verifica se o jogador adversário perdeu o jogo com este tiro(checkWin/1).Se isto acontecer dispara a função inicGame/2 e retorna 0.
+Se o jogador adversário ainda tiver peças retorna 99.      
+
+int checkWin(Player *p1);-->Verifica se o Player p1 perdeu o jogo. Retorna 1 caso seja verdadeiro ou 0 caso seja negativo.Caso o Player p1 tenha perdido o jogo é disparado a função winMeme().
+
+int checkPoint(Point *p, int size);-->Verifica se as coordenadas do ponto p poderão pertencer ao mapa.Retorna 1 caso possível ou 0 caso não seja. 
+
+Point *askPoint(Point *p, int size);-->Pede as coordeanadas de um ponto.
+Caso as coordenadas ultrapassem os limites do mapa,o jogador precisa de voltar a inserir novamente. Por fim retorna um apontador para o ponto.
+
+void askForMap(Map *map);-->Pede ao jogador para escolher o modo de inserir as peças referentes aos barcos no mapa.Existem dois modos: manual e Random. Depois de inserida a sua preferência é escolhida a função para este prepósito;
+
+void clearMemoryPlayers(Player *p1, Player *p2);-->Limpa a memória dos  Players p1 e p2.
+
+Modulo Playgame:
+
+Conjuga as várias funções principais: defineBattlefieldSize, initiatePlayer/2, game/3. Por fim é executada a função askcontinue() e o seu valor é retornado para a variável endGame que vai decidir se o jogo volta a reniciar(while(endGame)).   
+
 Modulo Ship:
+
+void informationShipRemaining(Ship *s)--->Imprime as informações dos barcos disponíveis para inserir no insertManual. Esta informação é constantamente actualizada após cada inserção de um barco. 
 
 Ship *initiateShip(int size); ---> Cria um array dinamicamente de tipo Ship e retorna o apontador da primeira posição. Cada posição representa um navio diferente. Por exemplo, a posição 0 (ship[0]) representa um carrier que de tamanho 5 e uma forma (T). Para além de inicializar as variáveis, esta função chama defineForm/1 que define a forma de cada barco.
 
@@ -81,3 +174,7 @@ void insertRandom(Map *m); --> Função coloca todos os navios de forma aleatór
 void findSomePlace(Map *m, Ship *ship, Point *p, char *dir); --> Iremos gerar um ponto aleatório e ver se para alguma direção é possível colocar o barco, se sim, perfeito paramos, caso contrario iremos mover o ponto para a direita e vemos e voltar a testar. Fazemos isto ate se encontrar uma direção e um ponto. Esta função chama findSomeDir/4 para gerar as diferentes direção e testar se é possível a colocação.
 
 int findSomeDir(Map *m, Ship *ship, Point *p, char *dir); --> dado um ponto iremos se rodar a direção e ver se é possível colocar o barco em alguma direção. Retornamos 1 caso seja possível 0 caso contrario. Iremos chamar rotateDir/1 para rodar a direção e placeIsPossible/4 para testar se é possível colocar o barco.
+
+
+
+
