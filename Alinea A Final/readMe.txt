@@ -1,6 +1,7 @@
 ﻿How to compile and run:
 $make clean
 $make
+$./main
 
 O programa é baseado no jogo da batalha naval jogado por duas pessoas.
 Os jogadores terão de definir o tamanho do mapa que será usado no jogo, o que corresponde a uma matriz quadrada (maior do que 19 e menor do que 41).
