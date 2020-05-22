@@ -76,17 +76,17 @@ void insertRandom(Map *root)
 {
   Point p;
   char dir;
-  
+
   for( int id = nextShip(root->ship); id!=-1; id=nextShip(root->ship) )
     {
       randomDir(&dir);
-      
+
       findSomePlace(root, &root->ship[id], &p, &dir);
-      
+
       insertShip(root, &root->ship[id], &p, dir);
     }
-}  
- 
+}
+
 void findSomePlace(Map *m, Ship *ship, Point *p, char *dir)
 {
   for( randomPoint(m, p); !findSomeDir(m, ship, p, dir); movePointLeft(m, p));
@@ -95,7 +95,7 @@ void findSomePlace(Map *m, Ship *ship, Point *p, char *dir)
 int findSomeDir(Map *m, Ship *ship, Point *p, char *dir)
 {
   int i;
-  
+
   for( i=0; i<4 && !placeIsPossible(m, ship, p, *dir); rotateDir(dir), i++ );
 
   return i<4 ? 1: 0;
@@ -114,11 +114,11 @@ int confAvaliable(Map *m, Ship *ship, Point *ref, char dir)
 
   if ( outOfBounds(m, ref) )
     errorMessageOut("conAvaliable");
-  
+
   for( int i=0; i<ship->size; i++ )
     {
       movePointInDir(ref, &ship->vec[i], &p, dir);
-      
+
       if ( outOfBounds(m, &p) )
 	return 0;
 
@@ -136,7 +136,7 @@ int voidAroundPoint(Map *root, Point *p)
 {
   if ( root==NULL || p==NULL )
     errorMessagePointer("voidAroundPoint");
-  
+
   Point temp;
   temp.x = p->x; temp.y = p->y;
 
@@ -152,14 +152,14 @@ int voidAroundPoint(Map *root, Point *p)
 
 	temp.x = p->x;
 	temp.y = p->y + i;
-	
+
 	if ( !outOfBounds(root, p) && searchShip(root, &temp)!=NULL )
-	  return 0;	
+	  return 0;
       }
 
   return 1;
 }
-  
+
 /*----------------------Insert Ship-----------------------*/
 void insertShip(Map *root, Ship *ship, Point *ref, char dir)
 {
@@ -167,7 +167,7 @@ void insertShip(Map *root, Ship *ship, Point *ref, char dir)
   for( int i=0; i<ship->size; i++ )
     {
       movePointInDir(ref, &ship->vec[i], &p, dir);
-  
+
       insertPointer(root, &p, ship);
     }
 
@@ -193,12 +193,12 @@ void insertPointer(Map *root, Point *p, Ship *ship)
 
   if ( temp==NULL )
     newNode(level, ship, p, '1', '0');
-  
+
   else
     {
       if ( temp->cell==NULL )
 	errorMessagePointer("insertCellInLevel");
-      
+
       temp->cell->ship = ship;
       temp->cell->bit = '1';
     }
@@ -211,7 +211,7 @@ void insertShoot(Map *root, Point *p, char shoot)
 
   if ( level==NULL )
     errorMessagePointer("insertPoint");
-  
+
   Node *temp = searchLevel(level, p);
 
   if ( temp==NULL )
@@ -233,7 +233,7 @@ void insertBit(Map *root, Point *p, char bit)
 
   if ( level==NULL )
     errorMessagePointer("insertPoint");
-  
+
   Node *temp = searchLevel(level, p);
 
   if ( temp==NULL )
@@ -260,7 +260,7 @@ int shootOponent(Map *map1, Map *map2, Point *p)
       return 0;
     }
 
-  else if ( *temp == '2' )
+  else if ( *temp == '2' || *temp == '3' )
     return 0;
 
   else if ( *temp == '1' )
@@ -283,7 +283,7 @@ int shootOponent(Map *map1, Map *map2, Point *p)
 
   else
     {
-      fprintf(stderr, "Construiste mal alguma celula ou não estas a verificar tudo\n");
+      fprintf(stderr, "Construiste mal alguma celula ou não estas a verificar tudo. Conteudo %c\n", *temp);
       exit(EXIT_FAILURE);
     }
 }
@@ -304,11 +304,11 @@ int sunk(Map *map, Point *p)
     }
 
   char saveBit = *temp;
-  
+
   insertBit(map, p, '4');
 
   int cond;
-  
+
   movePointInDir(p, &vec, &p1, 'e');
   cond = testCondition(map, &p1);
 
@@ -345,18 +345,18 @@ void randomDir(char *dir)
     case 0:
       *dir = 'e';
       break;
-      
+
     case 1:
       *dir = 'n';
       break;
-      
+
     case 2:
       *dir = 'w';
       break;
-      
+
     default:
       *dir = 's';
-      break;     
+      break;
     }
 }
 
@@ -385,7 +385,7 @@ void randomPoint(Map *m, Point *p)
   int n = rand() % ( m->mapSize * m->mapSize );
 
   p->x = n / m->mapSize + 1;
-  p->y = n % m->mapSize + 1;  
+  p->y = n % m->mapSize + 1;
 }
 
 /*--------------------------Move Point------------------------------*/
@@ -393,7 +393,7 @@ void movePointLeft(Map *m, Point *p)
 {
   if ( outOfBounds(m, p) )
     errorMessageOut("movePointLeft");
-  
+
   p->x++;
 
   if ( p->x > m->br->x )
@@ -429,9 +429,9 @@ void movePointInDir(Point *ref, Point *vec, Point *p, char dir)
       p->x = ref->x + vec->y;
       p->y = ref->y - vec->x;
       break;
-      
+
     default:
       fprintf(stderr,"Error on movePointInDir %c unknown direction\n", dir);
-      exit(EXIT_FAILURE);  
+      exit(EXIT_FAILURE);
     }
 }

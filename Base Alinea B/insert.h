@@ -41,4 +41,5 @@ int nextShip(Ship *ship);
 /*--------------------------Move Point------------------------------*/
 void movePointLeft(Map *level, Point *p);
 void movePointInDir(Point *ref, Point *vec, Point *p, char dir);
+
 #endif

@@ -1,6 +1,5 @@
 #include "search.h"
 
-
 char searchCharacter(Map *root, Point *p)
 {
   Node *n = searchNode(root, p);
