@@ -1,0 +1,5 @@
+stdin
+result
+hit
+result
+fail

@@ -1,0 +1,7 @@
+disparo
+3
+3
+disparo
+3
+3
+stdin
