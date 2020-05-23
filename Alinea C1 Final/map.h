@@ -50,7 +50,6 @@ typedef struct Node
 typedef struct Map
 {
   int mapSize;
-
   Point *tl, *br;
 
   Node *vec;
