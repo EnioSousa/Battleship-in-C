@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "input.h"
 #include "interface.h"
+#
 
 int main(int argc, char **argv)
 {
@@ -392,6 +393,6 @@ void stateWin(Player *p)
 void stateLose(Player *p)
 {
   printf("You lost\n");
-  inicGame(p->name, 2);
+  inicGame(p->name, 1);
   semop(semaid, changePlayer, 2);
 }
