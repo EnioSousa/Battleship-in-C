@@ -1,4 +1,5 @@
 #include "point.h"
+#include "interface.h"
 
 Point *newPoint(int x, int y)
 {

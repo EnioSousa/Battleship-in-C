@@ -52,7 +52,20 @@ void printAllShip(Ship *arrShip);
 void printShip(Ship *ship);
 
 /* Imprime a forma do barco numa mapa 5x5*/
-void printShipForm(Ship * ship);
+void printShipForm(Ship *ship);
 
+/*Imprime a direcções possiveis*/
+void directionHelpPrint();
+
+/*Imagens*/
+void menuStar();
+void winMeme();
+void inicGame(char *str, int i);
+
+/*Limpar a consola **/
+void clearTerminal();
+
+/*Esperar**/
+void waitS(int i);
 
 #endif
