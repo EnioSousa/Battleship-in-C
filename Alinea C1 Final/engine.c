@@ -79,10 +79,10 @@ void semaphoreManagement(int argc, char **argv)
   if ( semaid < 0 )
     reportAndExit("Failed to get semaphore\n");
 
-  /* definir que player fica com que semaforo */
   if ( argc!=2 || !stringIsNumber(argv[1]) )
     reportAndExit("Passing wrong arguments to main\n");
 
+  /* definir que player fica com que semaforo */
   you = atoi(argv[1])==1 ? 0: 1;
   him = you==0 ? 1: 0;
 
@@ -93,11 +93,8 @@ void semaphoreManagement(int argc, char **argv)
   arr[1] = 0;
   arg.array = arr;
 
-  printf("%d\n", semctl(semaid, 0, GETPID));
-  printf("%d\n", getpid());
-
   /* Basicamente estamos a ver se foi este o processo que
-     criou o semaforo. Caso afirmativo, iniciamos.
+     criou o semaforo ou o kernel. Caso afirmativo, iniciamos.
      Fazemos isto para não haver "corrupção" dos valores
      inicias do semafro*/
   int lastChange = semctl(semaid, 0, GETPID);
@@ -200,13 +197,13 @@ void state0(Map *map)
   /* Test if you can play*/
   semop(semaid, youPlay, 2);
 
+  /* Onwards its critical*/
   if ( map->won )
     return stateWin(map);
 
   else if ( map->lost )
     return stateLose(map);
 
-  /* Onwards its critical*/
   myReadLine(fd[rd]);
 
   state1(map);
@@ -225,7 +222,7 @@ void state1(Map *map)
 
   else
     {
-      printf("%s===", buffer);
+      printf("%s", buffer);
       reportAndExit("Unknown type. state1()\n");
     }
 }
@@ -242,6 +239,7 @@ void state2(Map *map)
 
   printf("Where to shoot?\n");
 
+  /*Read point. Cetificate que ele não le merda*/
   scanf("%d %d", &last.x, &last.y);
 
   state3(map, last);
