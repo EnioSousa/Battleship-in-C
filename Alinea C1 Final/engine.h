@@ -23,6 +23,7 @@
 #include "player.h"
 
 #include <time.h>
+#include <signal.h>
 
 /* Estrutura usada para iniciar o semaforo
    val -> Usado apenas por SETVAL
@@ -60,6 +61,11 @@ int rd, wr;
 Point last;
 
 struct sembuf changePlayer[2], youPlay[2];
+
+/* Esta função é reponsavel por gerir o sinal sigint. Isto porque
+   os semaphoros são da gestão do kernel e precisamos de avisar que
+   queremos remover o semaforo antes de sairmos abrutamente do programa.*/
+void handler_sigint(int sig);
 
 /* Função repora e faz exit caso haja algum erro. Atenção o
    programador é que fica responsavel de chamar esta função,

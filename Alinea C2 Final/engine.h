@@ -23,6 +23,7 @@
 
 #include <time.h>
 #include <sys/file.h>
+#include <signal.h>
 
 /* BUFFERSIZE -> Tamanho maximo do buffer.
    buffer -> Uma string que vai ser usada como "buffer" temporario
@@ -36,6 +37,11 @@ int fd;
 
 /* Last point shot*/
 Point last;
+
+/* É preciso ter cuidado ao sair do programa. Caso seja passado
+   GIGINT, O programa sai, mas não chega a fechar o FIFO_FILE. Esta
+   função combate esse problema.*/
+void handle_sigint(int sig);
 
 /* Função repora e faz exit caso haja algum erro. Atenção o
    programador é que fica responsavel de chamar esta função,

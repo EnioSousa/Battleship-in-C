@@ -2,6 +2,8 @@
 
 int main(int argc, char **argv)
 {
+  signal(SIGINT, handle_sigint);
+
   pipeManagement();
 
   bufferManagement();
@@ -16,20 +18,46 @@ int main(int argc, char **argv)
   return 0;
 }
 
+void handle_sigint(int sig)
+{
+  printf("Caught signal %d. Stop and unlink has been done\n", sig);
+  unlink(FIFO_FILE);
+  close(fd);
+  exit(EXIT_SUCCESS);
+}
+
+
+/* Basicamente o primeiro a criar o FIFO_FILE tambem
+   sera responsavel por escrever stdin. Na nossa
+   estrutura quem le stdin, ira ler do std input.
+   Com esta estrutura ambos os player 1 e 2 podem
+   ser os primeiros a jogar, ira depender de quem
+   criar o FIFO_FILE Primeiro.*/
 void pipeManagement()
 {
-  mkfifo(FIFO_FILE, S_IFIFO | 0666);
+  int initiateFifo = 0;
+
+  if ( mkfifo(FIFO_FILE, S_IFIFO | 0666) >= 0 )
+    initiateFifo = 1;
 
   fd = open(FIFO_FILE, O_RDWR);
 
   if ( fd < 0 )
     reportAndExit("Error on opening fifo. pipeManagement()\n");
+
+  if ( initiateFifo )
+    {
+      flock(fd, LOCK_EX);
+      write(fd, "stdin\n", 6);
+      flock(fd, LOCK_UN);
+    }
 }
 
 void reportAndExit(char *str)
 {
   fprintf(stderr, "%s\n", str);
   unlink(FIFO_FILE);
+  close(fd);
   exit(EXIT_FAILURE);
 }
 
@@ -73,8 +101,6 @@ char *myReadLine(int file)
 
   buffer[i-1] = '\0';
 
-  printf(">>>>>>>>>%s<<<<<<<<<\n", buffer);
-
   return buffer;
 }
 
@@ -96,15 +122,11 @@ void start(Map *map, int nPlayer)
   if ( nPlayer!=1 && nPlayer!=2 )
     reportAndExit("Player has to be 1 or 2. start()\n");
 
-  if ( nPlayer==1 )
-    write(fd, "stdin\n", 6);
-
   state0(map);
 }
 
 void state0(Map *map)
 {
-  printf("State 0\n");
   printf("Wait\n");
 
   if ( map->won )
@@ -123,7 +145,6 @@ void state0(Map *map)
 
 void state1(Map *map)
 {
-  printf("State 1\n");
   if ( strcmp("stdin", buffer)==0 )
     state2(map);
 
@@ -144,7 +165,6 @@ void state1(Map *map)
    É importante isto tar a funcionar corretamente men!!!*/
 void state2(Map *map)
 {
-  printf("State 2\n");
   if ( map->won )
     return stateWin(map);
 
@@ -161,7 +181,6 @@ void state2(Map *map)
 
 void state3(Map *map, Point p)
 {
-  printf("State 3\n");
   snprintf(buffer, BUFFERSIZE, "disparo\n%d\n%d\n", p.x, p.y);
 
   write(fd, buffer, strlen(buffer));
@@ -171,16 +190,25 @@ void state3(Map *map, Point p)
 
 void state4(Map *map)
 {
-  printf("State 4\n");
   if ( flock(fd, LOCK_UN) < 0 )
     reportAndExit("Failed to unlock the lock\n");
+
+
+  /* É preciso parar este processo, para certificarmos que o outro
+     processo, pede uma chave exclusiva ao FIFO_FILE. Basicamente
+     estamos a dizer ao kernel: agora para este processo e ve se
+     tens outros processos a espera de executar, caso afirmativo
+     ele ira correr o outro processo, e o outro processo
+     encontra-se num estado em que esta a espera ou ira pedir uma
+     chave exclusiva. Com este sleep consiguimos uma cominicação
+     sem corrupção */
+  sleep(1);
 
   state0(map);
 }
 
 void state5(Map *map)
 {
-  printf("State 5\n");
   myReadLine(fd);
 
   if ( strcmp("hit", buffer)==0 )
@@ -198,7 +226,6 @@ void state5(Map *map)
 
 void state6(Map *map)
 {
-  printf("State 6\n");
   updateHistory(map, &last, 1);
 
   display(map);
@@ -208,7 +235,6 @@ void state6(Map *map)
 
 void state7(Map *map)
 {
-  printf("State 7\n");
   updateHistory(map, &last, 0);
 
   display(map);
@@ -218,7 +244,6 @@ void state7(Map *map)
 
 void state8(Map *map)
 {
-  printf("State 8\n");
   snprintf(buffer, BUFFERSIZE, "stdin\n");
 
   write(fd, buffer, strlen(buffer));
@@ -228,7 +253,6 @@ void state8(Map *map)
 
 void state9(Map *map)
 {
-  printf("State 9\n");
   Point p;
 
   myReadLine(fd);
@@ -256,7 +280,6 @@ void state9(Map *map)
 
 void state10(Map *map, Point p)
 {
-  printf("State 10\n");
   int cnd = shoot(map, &p);
 
   display(map);
@@ -266,7 +289,6 @@ void state10(Map *map, Point p)
 
 void state11(Map *map, int cnd)
 {
-  printf("State 11\n");
   snprintf(buffer, BUFFERSIZE, "result\n%s", cnd==1 ? "hit\n": "fail\n");
 
   write(fd, buffer, strlen(buffer));

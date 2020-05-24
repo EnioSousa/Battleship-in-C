@@ -5,9 +5,14 @@
 
 int main(int argc, char **argv)
 {
+  signal(SIGINT, handler_sigint);
+
   fileManagement(argc, argv);
+
   semaphoreManagement(argc, argv);
+
   bufferManagement();
+
   int size = atoi(argv[2]);
   menuStar();
   Player *p = initiate(size);
@@ -19,6 +24,13 @@ int main(int argc, char **argv)
   semctl(semaid, 0, IPC_RMID, 0);
 
   return 0;
+}
+
+void handler_sigint(int sig)
+{
+  printf("Caught signal %d. Stop and unlink has been done\n", sig);
+  semctl(semaid, 0, IPC_RMID, 0);
+  exit(EXIT_SUCCESS);
 }
 
 void reportAndExit(char *str)
@@ -91,8 +103,19 @@ void semaphoreManagement(int argc, char **argv)
   /* Iniciar o semaforo */
   union semun arg;
   ushort arr[2];
-  arr[0] = 1;
-  arr[1] = 0;
+
+  /* Ambos os jogadores vão querer jogar primeiro*/
+  if ( atoi(argv[1])==1 )
+    {
+      arr[0] = 1;
+      arr[1] = 0;
+    }
+  else
+    {
+      arr[0] = 0;
+      arr[1] = 1;
+    }
+
   arg.array = arr;
 
   //printf("%d\n", semctl(semaid, 0, GETPID));
@@ -101,12 +124,25 @@ void semaphoreManagement(int argc, char **argv)
   /* Basicamente estamos a ver se foi este o processo que
      criou o semaforo. Caso afirmativo, iniciamos.
      Fazemos isto para não haver "corrupção" dos valores
-     inicias do semafro*/
+     inicias do semafro e para ver quem joga primeiro*/
   int lastChange = semctl(semaid, 0, GETPID);
 
-  if (lastChange == 0 || lastChange == getpid())
-    if (semctl(semaid, 0, SETALL, arg) < 0)
-      reportAndExit("Set semaphore error. main\n");
+  /* lastChange == 0 -> Kernel*/
+  if ( lastChange == 0 || lastChange == getpid() )
+    {
+      if (semctl(semaid, 0, SETALL, arg) < 0)
+	reportAndExit("Set semaphore error. main\n");
+
+      int temp = open(atoi(argv[1])==1 ? "player1.txt": "player2.txt", O_WRONLY | O_CREAT, 0666);
+
+      write(temp, "stdin\n", 6);
+
+      close(temp);
+    }
+  /* É preciso de sinconizar o cursor. Basicamente é um porcaria
+     tentar sincronizar processos.*/
+  else
+    write(fd[wr], "stdin\n", 6);
 
   /* Definir como mudar de jogador e quando é que se pode jogar*/
   for (int i = 0; i < 2; i++)
@@ -193,19 +229,19 @@ void start(Player *p, int nPlayer)
   if (nPlayer != 1 && nPlayer != 2)
     reportAndExit("Player has to be 1 or 2. start()\n");
 
-  /* Player1 escreve. Para certificar que temos algo para ler*/
-  if (nPlayer == 1)
-  {
-    int temp = open("player1.txt", O_WRONLY | O_CREAT, 0666);
+  /* /\* Player1 escreve. Para certificar que temos algo para ler*\/ */
+  /* if (nPlayer == 1) */
+  /* { */
+  /*   int temp = open("player1.txt", O_WRONLY | O_CREAT, 0666); */
 
-    write(temp, "stdin\n", 6);
+  /*   write(temp, "stdin\n", 6); */
 
-    close(temp);
-  }
-  /* Player 2 escreve. Para sinconizar o cursor caso palyer 1 tenha
-     escrito alguma coisa*/
-  else
-    write(fd[wr], "stdin\n", 6);
+  /*   close(temp); */
+  /* } */
+  /* /\* Player 2 escreve. Para sinconizar o cursor caso palyer 1 tenha */
+  /*    escrito alguma coisa*\/ */
+  /* else */
+  /*   write(fd[wr], "stdin\n", 6); */
 
   state0(p);
 }
