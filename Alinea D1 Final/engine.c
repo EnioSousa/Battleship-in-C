@@ -2,18 +2,18 @@
 
 int main(int argc, char **argv)
 {
-  signal(SIGINT, handle_sigint);
+  int seed = atoi(argv[2])==2 ? time(NULL) + 1250: time(NULL);
+  srand(seed);
 
-  pipeManagement();
+  signal(SIGINT, handle_sigint);
 
   bufferManagement();
 
+  fd = atoi(argv[1]);
+
   Map *map = initiatePlayer();
 
-  start(map, atoi(argv[1]));
-
-  close(fd);
-  unlink(FIFO_FILE);
+  start(map, atoi(argv[2]));
 
   return 0;
 }
@@ -26,38 +26,9 @@ void handle_sigint(int sig)
   exit(EXIT_SUCCESS);
 }
 
-
-/* Basicamente o primeiro a criar o FIFO_FILE tambem
-   sera responsavel por escrever stdin. Na nossa
-   estrutura quem le stdin, ira ler do std input.
-   Com esta estrutura ambos os player 1 e 2 podem
-   ser os primeiros a jogar, ira depender de quem
-   criar o FIFO_FILE Primeiro.*/
-void pipeManagement()
-{
-  int initiateFifo = 0;
-
-  if ( mkfifo(FIFO_FILE, S_IFIFO | 0666) >= 0 )
-    initiateFifo = 1;
-
-  fd = open(FIFO_FILE, O_RDWR);
-
-  if ( fd < 0 )
-    reportAndExit("Error on opening fifo. pipeManagement()\n");
-
-  if ( initiateFifo )
-    {
-      flock(fd, LOCK_EX);
-      write(fd, "stdin\n", 6);
-      flock(fd, LOCK_UN);
-    }
-}
-
 void reportAndExit(char *str)
 {
   fprintf(stderr, "%s\n", str);
-  unlink(FIFO_FILE);
-  close(fd);
   exit(EXIT_FAILURE);
 }
 
@@ -89,12 +60,12 @@ char *myReadLine(int file)
       if ( byteRead < 0 )
 	reportAndExit("Read failed. myReadLine()\n");
 
-      if ( buffer[0]=='\n' )
+      if ( buffer[0]=='\n' || buffer[0]=='\0' )
 	continue;
 
       i++;
 
-    }while( byteRead > 0 && i<BUFFERSIZE-1 && buffer[i-1]!='\n' && buffer[i-1]!='\0');
+    }while( byteRead > 0 && i<BUFFERSIZE-1 && buffer[i-1]!='\n' );
 
   if ( i==0 )
     reportAndExit("Someting wrong with myReadLine. myReadLine\n");
@@ -107,8 +78,6 @@ char *myReadLine(int file)
 /* Altera esta função joão. Podes tambem alterar o tipo de retorno*/
 Map *initiatePlayer()
 {
-  srand(time(NULL));
-
   Map *map = newMap(10, initiateShip(10));
   insertRandom(map);
 
@@ -139,6 +108,8 @@ void state0(Map *map)
     reportAndExit("Failed to acquire the lock\n");
 
   myReadLine(fd);
+
+  printf(">>>>>>>>>>>>>>%s<<<<<<<<<<<<<\n", buffer);
 
   state1(map);
 }
@@ -192,17 +163,6 @@ void state4(Map *map)
 {
   if ( flock(fd, LOCK_UN) < 0 )
     reportAndExit("Failed to unlock the lock\n");
-
-
-  /* É preciso parar este processo, para certificarmos que o outro
-     processo, pede uma chave exclusiva ao FIFO_FILE. Basicamente
-     estamos a dizer ao kernel: agora para este processo e ve se
-     tens outros processos a espera de executar, caso afirmativo
-     ele ira correr o outro processo, e o outro processo
-     encontra-se num estado em que esta a espera ou ira pedir uma
-     chave exclusiva. Com este sleep consiguimos uma cominicação
-     sem corrupção */
-  sleep(1);
 
   state0(map);
 }

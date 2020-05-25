@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define PORT 6969
 
@@ -12,9 +14,14 @@ char *buffer;
 
 int serverFd, newSocket;
 
+char **fArg;
+
 void reportAndExit(char *str);
 void bufferManagement();
 void sockManagement();
+
+void argumentManagement(int argc, char **argv);
+char *newCharArray(int n);
 
 int main(int argc, char **argv)
 {
@@ -22,8 +29,26 @@ int main(int argc, char **argv)
 
   sockManagement();
 
-  close(sock);
-  close(newSock);
+  argumentManagement(argc, argv);
+
+  pid_t pid = fork();
+
+  if ( pid < 0 )
+    reportAndExit("Error on fork. main\n");
+
+  else if ( pid > 0 )
+    {
+      if ( waitpid(pid, NULL, 0) < 0 )
+	reportAndExit("Failed to catch exit. main\n");
+    }
+  else
+    {
+      if ( execv("./main", fArg) < 0 )
+	reportAndExit("Error on execv. main\n");
+    }
+
+  close(serverFd);
+  close(newSocket);
 
   return 0;
 }
@@ -75,9 +100,36 @@ void sockManagement()
   if ( newSocket < 0 )
     reportAndExit("accept failed. main\n");
 
-  /* Teste*/
+  //Teste
   read(newSocket, buffer, BUFFERSIZE-1);
   printf("Server: %s\n", buffer);
   strcpy(buffer, "Hello from server\n");
   write(newSocket, buffer,strlen(buffer));
+}
+
+void argumentManagement(int argc, char **argv)
+{
+  fArg = (char **)calloc(5, sizeof(char *));
+
+  if ( fArg == NULL )
+    reportAndExit("Memory alocation failed. argumentManagement\n");
+
+  for( int i=0; i<5; i++ )
+    fArg[i] = newCharArray(128);
+
+  strcpy(fArg[0], "main");
+  snprintf(fArg[1], 127, "%d", newSocket);
+  strcpy(fArg[2], "1");
+  strncpy(fArg[3], argv[1], 127);
+  fArg[4] = NULL;
+}
+
+char *newCharArray(int n)
+{
+  char *temp = (char *)calloc(n, sizeof(char));
+
+  if ( temp == NULL )
+    reportAndExit("Memory alocation failed. newCharArray\n");
+
+  return temp;
 }

@@ -4,6 +4,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+ #include <sys/wait.h>
 
 #define PORT 6969
 
@@ -18,29 +20,38 @@ void reportAndExit(char *str);
 void bufferManagement();
 void sockManagement(char *ip);
 
+void argumentManagement(int argc, char **argv);
+char *newCharArray(int n);
+
 int main(int argc, char **argv)
 {
+  /**/
   bufferManagement();
 
-  if ( argc != 2 )
+  if ( argc != 3 )
     reportAndExit("argv errado. main\n");
 
   sockManagement(argv[1]);
 
-  pid_t pid = forK();
+  argumentManagement(argc, argv);
+
+  pid_t pid = fork();
 
   if ( pid < 0 )
     reportAndExit("Failed to fork. main\n");
 
-  if ( pid > 0 )
+  else if ( pid > 0 )
     {
-      if ( waitpid(pid) < 0 )
+      if ( waitpid(pid, NULL, 0) < 0 )
 	reportAndExit("Failed to catch son exit. main\n");
     }
 
   else
     {
-      argumentManager(argc, argv);
+      write(sock, "stdin\n", 6);
+
+      if ( execv("./main", fArg) < 0 )
+	reportAndExit("Error on execv. main\n");
     }
 
   return 0;
@@ -100,10 +111,11 @@ void argumentManagement(int argc, char **argv)
   for( int i=0; i<5; i++ )
     fArg[i] = newCharArray(128);
 
-  strncpy(argv[1], "main");
-  strncpy(argv[1], "main");
-  strncpy(argv[1], "main");
-  strncpy(argv[1], "main");
+  strcpy(fArg[0], "main");
+  snprintf(fArg[1], 127, "%d", sock);
+  strcpy(fArg[2], "2");
+  strncpy(fArg[3], argv[2], 127);
+  fArg[4] = NULL;
 }
 
 char *newCharArray(int n)

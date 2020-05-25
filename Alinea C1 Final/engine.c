@@ -247,6 +247,8 @@ void state0(Player *p)
   /* Onwards its critical*/
   myReadLine(fd[rd]);
 
+  printf(">>>>>>>>>%s<<<<<<<<<<\n", fd[rd]);
+
   state1(p);
 }
 
