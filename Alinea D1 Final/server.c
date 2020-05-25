@@ -33,6 +33,8 @@ int main(int argc, char **argv)
 
   pid_t pid = fork();
 
+  printf("Passou\n");
+
   if ( pid < 0 )
     reportAndExit("Error on fork. main\n");
 

@@ -109,8 +109,6 @@ void state0(Map *map)
 
   myReadLine(fd);
 
-  printf(">>>>>>>>>>>>>>%s<<<<<<<<<<<<<\n", buffer);
-
   state1(map);
 }
 
