@@ -13,7 +13,7 @@ int main(int argc, char **argv)
   bufferManagement();
 
   int size = atoi(argv[2]);
-  menuStar();
+  //menuStar();
   Player *p = initiate(size);
 
   start(p, atoi(argv[1]));
@@ -47,10 +47,6 @@ void fileManagement(int argc, char **argv)
   /* Definir onde ler e onde escrever*/
   rd = atoi(argv[1]) == 1 ? 0 : 1;
   wr = rd == 0 ? 1 : 0;
-
-  /* Apaga o conteudo dos files*/
-  fclose(fopen("player1.txt", "w"));
-  fclose(fopen("player2.txt", "w"));
 
   /* Abrir os ficheiros para ler e escrever.*/
   if (atoi(argv[1]) == 1)
@@ -127,10 +123,14 @@ void semaphoreManagement(int argc, char **argv)
   int lastChange = semctl(semaid, 0, GETPID);
 
   /* lastChange == 0 -> Kernel*/
-  if ( lastChange == 0 || lastChange == getpid() )
+  if ( lastChange == 0 )
     {
       if (semctl(semaid, 0, SETALL, arg) < 0)
 	reportAndExit("Set semaphore error. main\n");
+
+      /* Apaga o conteudo dos files*/
+      fclose(fopen("player1.txt", "w"));
+      fclose(fopen("player2.txt", "w"));
 
       int temp = open(atoi(argv[1])==1 ? "player1.txt": "player2.txt", O_WRONLY | O_CREAT, 0666);
 
@@ -179,7 +179,7 @@ char *myReadLine(int file)
     if (byteRead < 0)
       reportAndExit("Read failed. myReadLine()\n");
 
-    if (buffer[0] == '\n')
+    if (buffer[0] == '\n'|| buffer[0] == '\0' )
       continue;
 
     i++;
@@ -210,13 +210,13 @@ Player *initiate(int size)
   char ch = getchar();
   getchar();
   if (ch == 'y')
-  {
-    insertManual(p->map);
-  }
+    {
+      insertManual(p->map);
+    }
   else
-  {
-    insertRandom(p->map);
-  }
+    {
+      insertRandom(p->map);
+    }
   clearTerminal();
   display(p->map);
 
@@ -246,8 +246,6 @@ void state0(Player *p)
 
   /* Onwards its critical*/
   myReadLine(fd[rd]);
-
-  printf(">>>>>>>>>%s<<<<<<<<<<\n", buffer);
 
   state1(p);
 }
@@ -282,19 +280,19 @@ void state2(Player *p)
     return stateLose(p);
 
   while (cycle)
-  {
-    cycle = 0;
-    printf("Where to shoot?\n");
-    printf("X coordinate\n");
-    last.x = inputCheck();
-    printf("Y coordinate\n");
-    last.y = inputCheck();
-    if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
     {
-      printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
-      cycle = 1;
+      cycle = 0;
+      printf("Where to shoot?\n");
+      printf("X coordinate\n");
+      last.x = inputCheck();
+      printf("Y coordinate\n");
+      last.y = inputCheck();
+      if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
+	{
+	  printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
+	  cycle = 1;
+	}
     }
-  }
   clearTerminal();
   state3(p, last);
 }

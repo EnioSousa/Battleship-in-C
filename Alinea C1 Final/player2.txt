@@ -1,3 +1,6 @@
 disparo
-10
 2
+2
+stdin
+result
+hit

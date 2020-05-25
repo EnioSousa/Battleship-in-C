@@ -1,3 +1,6 @@
 stdin
 result
-hit
+fail
+disparo
+2
+2
