@@ -39,11 +39,11 @@ int fd;
 Point last;
 
 /* É preciso ter cuidado ao sair do programa. Caso seja passado
-   GIGINT, O programa sai, mas não chega a fechar o Pipe. Esta
+   GIGINT, O programa sai, mas não chega a fechar o FIFO_FILE. Esta
    função combate esse problema.*/
 void handle_sigint(int sig);
 
-/* Função reporta e faz exit caso haja algum erro. Atenção o
+/* Função repora e faz exit caso haja algum erro. Atenção o
    programador é que fica responsavel de chamar esta função,
    ela so serve para o programador saber onde esta a falhar.*/
 void reportAndExit(char *str);

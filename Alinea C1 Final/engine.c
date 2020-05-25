@@ -1,7 +1,6 @@
 #include "engine.h"
 #include "input.h"
 #include "interface.h"
-#
 
 int main(int argc, char **argv)
 {
@@ -228,20 +227,6 @@ void start(Player *p, int nPlayer)
 {
   if (nPlayer != 1 && nPlayer != 2)
     reportAndExit("Player has to be 1 or 2. start()\n");
-
-  /* /\* Player1 escreve. Para certificar que temos algo para ler*\/ */
-  /* if (nPlayer == 1) */
-  /* { */
-  /*   int temp = open("player1.txt", O_WRONLY | O_CREAT, 0666); */
-
-  /*   write(temp, "stdin\n", 6); */
-
-  /*   close(temp); */
-  /* } */
-  /* /\* Player 2 escreve. Para sinconizar o cursor caso palyer 1 tenha */
-  /*    escrito alguma coisa*\/ */
-  /* else */
-  /*   write(fd[wr], "stdin\n", 6); */
 
   state0(p);
 }
