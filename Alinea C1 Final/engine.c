@@ -140,7 +140,7 @@ void semaphoreManagement(int argc, char **argv)
       close(temp);
     }
   /* É preciso de sinconizar o cursor. Basicamente é um porcaria
-     tentar sincronizar processos.*/
+     e uma dor de cabeça tentar sincronizar processos.*/
   else
     write(fd[wr], "stdin\n", 6);
 
