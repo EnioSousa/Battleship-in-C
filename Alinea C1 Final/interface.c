@@ -196,7 +196,10 @@ void printMap(Map *root)
   printf("\n   ");
 
   for (int i = 0; i < root->mapSize; i++)
-    printf("%2d", i + 1);
+    if (i % 2 == 0)
+      printf(ANSI_COLOR_RED "%2d" ANSI_COLOR_RESET, i + 1);
+    else
+      printf(ANSI_COLOR_YELLOW "%2d" ANSI_COLOR_RESET, i + 1);
 
   printf("\n\n");
 }
@@ -251,8 +254,12 @@ void printHistory(Map *root)
   printf("\n   ");
 
   for (int i = 0; i < root->mapSize; i++)
-    printf("%2d", i + 1);
-
+  {
+    if (i % 2 == 0)
+      printf(ANSI_COLOR_RED "%2d" ANSI_COLOR_RESET, i + 1);
+    else
+      printf(ANSI_COLOR_YELLOW "%2d" ANSI_COLOR_RESET, i + 1);
+  }
   printf("\n\n");
 }
 
