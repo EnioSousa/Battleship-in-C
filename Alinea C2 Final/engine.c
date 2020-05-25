@@ -1,4 +1,7 @@
 #include "engine.h"
+#include "input.h"
+#include "interface.h"
+
 
 int main(int argc, char **argv)
 {
@@ -8,9 +11,11 @@ int main(int argc, char **argv)
 
   bufferManagement();
 
-  Map *map = initiatePlayer();
-
-  start(map, atoi(argv[1]));
+  int size = atoi(argv[2]);
+  menuStar();
+  Player *p = initiate(size);
+  
+  start(p, atoi(argv[1]));
 
   close(fd);
   unlink(FIFO_FILE);
@@ -105,54 +110,70 @@ char *myReadLine(int file)
 }
 
 /* Altera esta função joão. Podes tambem alterar o tipo de retorno*/
-Map *initiatePlayer()
+Player *initiate(int size)
 {
+  char *name = getName();
   srand(time(NULL));
+  Ship *s = initiateShip(size);
+  inicGame(name, 0);
+  waitS(0);
+  printAllShip(s);
+  waitS(0);
+  Map *map = newMap(size, s);
+  Player *p = initiatePlayer(name, map);
+  printf(ANSI_COLOR_GREEN "If you want to insert Manual press y, if you want Random press any key\n" ANSI_COLOR_RESET);
+  char ch = getchar();
+  getchar();
+  if (ch == 'y')
+  {
+    insertManual(p->map);
+  }
+  else
+  {
+    insertRandom(p->map);
+  }
+  clearTerminal();
+  display(p->map);
 
-  Map *map = newMap(10, initiateShip(10));
-  insertRandom(map);
-
-  display(map);
-
-  return map;
+  return p;
 }
 
-void start(Map *map, int nPlayer)
+void start(Player *p, int nPlayer)
 {
   if ( nPlayer!=1 && nPlayer!=2 )
     reportAndExit("Player has to be 1 or 2. start()\n");
 
-  state0(map);
+  state0(p);
 }
 
-void state0(Map *map)
+void state0(Player *p)
 {
   printf("Wait\n");
 
-  if ( map->won )
-    return stateWin(map);
+  if ( p->map->won )
+    return stateWin(p);
 
-  else if ( map->lost )
-    return stateLose(map);
+  else if ( p->map->lost )
+    return stateLose(p);
 
   if ( flock(fd, LOCK_EX) < 0 )
     reportAndExit("Failed to acquire the lock\n");
 
   myReadLine(fd);
 
-  state1(map);
+  state1(p);
 }
 
-void state1(Map *map)
+void state1(Player *p)
 {
   if ( strcmp("stdin", buffer)==0 )
-    state2(map);
+    state2(p);
 
   else if ( strcmp("result", buffer)==0 )
-    state5(map);
+    state5(p);
 
   else if ( strcmp("disparo", buffer)==0 )
-    state9(map);
+    state9(p);
 
   else
     {
@@ -163,32 +184,45 @@ void state1(Map *map)
 
 /* Altera esta função para o programa não ler merda do utilizador.
    É importante isto tar a funcionar corretamente men!!!*/
-void state2(Map *map)
+void state2(Player *p)
 {
-  if ( map->won )
-    return stateWin(map);
+  int cycle = 1;
+  if (p->map->won)
+    return stateWin(p);
 
-  else if ( map->lost )
-    return stateLose(map);
+  else if (p->map->lost)
+    return stateLose(p);
 
-  printf("Where to shoot?\n");
-
-  /*Read point. Cetificate que ele não le merda*/
-  scanf("%d %d", &last.x, &last.y);
-
-  state3(map, last);
+  while (cycle)
+  {
+    cycle = 0;
+    printf("Where to shoot?\n");
+    printf("X coordinate\n");
+    last.x = inputCheck();
+    printf("Y coordinate\n");
+    last.y = inputCheck();
+    if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
+    {
+      printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
+      cycle = 1;
+    }
+  }
+  clearTerminal();
+  state3(p, last);
+  
+  
 }
 
-void state3(Map *map, Point p)
+void state3(Player *m, Point p)
 {
   snprintf(buffer, BUFFERSIZE, "disparo\n%d\n%d\n", p.x, p.y);
 
   write(fd, buffer, strlen(buffer));
 
-  state4(map);
+  state4(m);
 }
 
-void state4(Map *map)
+void state4(Player *p)
 {
   if ( flock(fd, LOCK_UN) < 0 )
     reportAndExit("Failed to unlock the lock\n");
@@ -204,18 +238,18 @@ void state4(Map *map)
      sem corrupção */
   sleep(1);
 
-  state0(map);
+  state0(p);
 }
 
-void state5(Map *map)
+void state5(Player *p)
 {
   myReadLine(fd);
 
   if ( strcmp("hit", buffer)==0 )
-    state6(map);
+    state6(p);
 
   else if ( strcmp("fail", buffer)==0 )
-    state7(map);
+    state7(p);
 
   else
     {
@@ -224,34 +258,34 @@ void state5(Map *map)
     }
 }
 
-void state6(Map *map)
+void state6(Player *p)
 {
-  updateHistory(map, &last, 1);
+  updateHistory(p->map, &last, 1);
 
-  display(map);
+  display(p->map);
 
-  state2(map);
+  state2(p);
 }
 
-void state7(Map *map)
+void state7(Player *p)
 {
-  updateHistory(map, &last, 0);
+  updateHistory(p->map, &last, 0);
 
-  display(map);
+  display(p->map);
 
-  state8(map);
+  state8(p);
 }
 
-void state8(Map *map)
+void state8(Player *p)
 {
   snprintf(buffer, BUFFERSIZE, "stdin\n");
 
   write(fd, buffer, strlen(buffer));
 
-  state4(map);
+  state4(p);
 }
 
-void state9(Map *map)
+void state9(Player *pt)
 {
   Point p;
 
@@ -275,33 +309,37 @@ void state9(Map *map)
 
   p.y = atoi(buffer);
 
-  state10(map, p);
+  state10(pt, p);
 }
 
-void state10(Map *map, Point p)
+void state10(Player *pt, Point p)
 {
-  int cnd = shoot(map, &p);
+  int cnd = shoot(pt->map, &p);
 
-  display(map);
-
-  state11(map, cnd);
+ 
+  display(pt->map);
+  state11(pt, cnd);
 }
 
-void state11(Map *map, int cnd)
+void state11(Player *p, int cnd)
 {
   snprintf(buffer, BUFFERSIZE, "result\n%s", cnd==1 ? "hit\n": "fail\n");
 
   write(fd, buffer, strlen(buffer));
 
-  state4(map);
+  state4(p);
 }
 
-void stateWin(Map *map)
+void stateWin(Player *p)
 {
+  winMeme();
   printf("You won\n");
+  inicGame(p->name, 2);
 }
 
-void stateLose(Map *map)
+void stateLose(Player *p)
 {
+  printf("You lost\n");
+  inicGame(p->name, 1);
   printf("You lost\n");
 }
