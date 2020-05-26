@@ -1,10 +1,10 @@
 CC=gcc
 CFLAGS=-I. -Wall
-DEPS = engine.h errorMessage.h point.h ship.h map.h search.h insert.h interface.h mapLinkedList.h delete.h
+DEPS = engine.h errorMessage.h point.h ship.h map.h search.h insert.h interface.h mapLinkedList.h delete.h input.h player.h
 
 ODIR=./bin
 
-_OBJ = engine.o errorMessage.o point.o ship.o map.o search.o insert.o interface.o mapLinkedList.o delete.o
+_OBJ = engine.o errorMessage.o point.o ship.o map.o search.o insert.o interface.o mapLinkedList.o delete.o input.o player.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _OBJC = client.o

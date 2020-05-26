@@ -20,11 +20,12 @@
 #include "ship.h"
 #include "interface.h"
 #include "insert.h"
+#include "player.h"
 
 #include <time.h>
 #include <sys/file.h>
 #include <signal.h>
-
+#
 /* BUFFERSIZE -> Tamanho maximo do buffer.
    buffer -> Uma string que vai ser usada como "buffer" temporario
    antes de escrevermos nos files*/
@@ -66,26 +67,26 @@ char *myReadLine(int file);
 /* Altera esta função joão. Podes tambem alterar o tipo de retorno
    Altera de modo a receberes apenas o nome do jogador e ver se o gajo
    quer manual ou random*/
-Map *initiatePlayer();
+Player* initiate(int size);
 
 /* Funções stateX por favor ver o automato em anexo. Basicamente
    eles são o ciclo logico de execução. Ver o automato pois é
    bastante facil de perceber*/
-void start(Map *map, int nPlayer);
-void state0(Map *map);
-void state1(Map *map);
-void state2(Map *map);
-void state3(Map *map, Point p);
-void state4(Map *map);
-void state5(Map *map);
-void state6(Map *map);
-void state7(Map *map);
-void state8(Map *map);
-void state9(Map *map);
-void state10(Map *map, Point p);
-void state11(Map *map, int cnd);
-void stateWin(Map *map);
-void stateLose(Map *map);
 
+void start(Player *p, int nPlayer);
+void state0(Player *p);
+void state1(Player *p);
+void state2(Player *p);
+void state3(Player *p, Point po);
+void state4(Player *p);
+void state5(Player *p);
+void state6(Player *p);
+void state7(Player *p);
+void state8(Player *p);
+void state9(Player *p);
+void state10(Player *p, Point po);
+void state11(Player *p, int cnd);
+void stateWin(Player *p);
+void stateLose(Player *p);
 
 #endif
