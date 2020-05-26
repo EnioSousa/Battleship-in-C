@@ -339,7 +339,7 @@ void stateWin(Player *p)
 
 void stateLose(Player *p)
 {
-  printf("You lost\n");
+  
   inicGame(p->name, 1);
   printf("You lost\n");
 }
