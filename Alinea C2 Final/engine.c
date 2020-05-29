@@ -11,10 +11,12 @@ int main(int argc, char **argv)
 
   bufferManagement();
 
+  sleepManagement();
+
   int size = atoi(argv[2]);
   menuStar();
   Player *p = initiate(size);
-  
+
   start(p, atoi(argv[1]));
 
   close(fd);
@@ -56,6 +58,12 @@ void pipeManagement()
       write(fd, "stdin\n", 6);
       flock(fd, LOCK_UN);
     }
+}
+
+void sleepManagement()
+{
+  req.tv_sec = 0;
+  req.tv_nsec = 50 * 1000000; // 50 milesegundos
 }
 
 void reportAndExit(char *str)
@@ -125,13 +133,11 @@ Player *initiate(int size)
   char ch = getchar();
   getchar();
   if (ch == 'y')
-  {
     insertManual(p->map);
-  }
+
   else
-  {
     insertRandom(p->map);
-  }
+
   clearTerminal();
   display(p->map);
 
@@ -150,14 +156,14 @@ void state0(Player *p)
 {
   printf("Wait\n");
 
+  if ( flock(fd, LOCK_EX) < 0 )
+    reportAndExit("Failed to acquire the lock\n");
+
   if ( p->map->won )
     return stateWin(p);
 
   else if ( p->map->lost )
     return stateLose(p);
-
-  if ( flock(fd, LOCK_EX) < 0 )
-    reportAndExit("Failed to acquire the lock\n");
 
   myReadLine(fd);
 
@@ -187,6 +193,7 @@ void state1(Player *p)
 void state2(Player *p)
 {
   int cycle = 1;
+
   if (p->map->won)
     return stateWin(p);
 
@@ -207,10 +214,9 @@ void state2(Player *p)
       cycle = 1;
     }
   }
+
   clearTerminal();
   state3(p, last);
-  
-  
 }
 
 void state3(Player *m, Point p)
@@ -227,7 +233,6 @@ void state4(Player *p)
   if ( flock(fd, LOCK_UN) < 0 )
     reportAndExit("Failed to unlock the lock\n");
 
-
   /* É preciso parar este processo, para certificarmos que o outro
      processo, pede uma chave exclusiva ao FIFO_FILE. Basicamente
      estamos a dizer ao kernel: agora para este processo e ve se
@@ -236,7 +241,8 @@ void state4(Player *p)
      encontra-se num estado em que esta a espera ou ira pedir uma
      chave exclusiva. Com este sleep consiguimos uma cominicação
      sem corrupção */
-  sleep(1);
+  if ( nanosleep(&req, NULL) < 0 )
+    reportAndExit("nanosleep failed. state4\n");
 
   state0(p);
 }
@@ -316,7 +322,7 @@ void state10(Player *pt, Point p)
 {
   int cnd = shoot(pt->map, &p);
 
- 
+
   display(pt->map);
   state11(pt, cnd);
 }
@@ -339,7 +345,7 @@ void stateWin(Player *p)
 
 void stateLose(Player *p)
 {
-  
+
   inicGame(p->name, 1);
   printf("You lost\n");
 }

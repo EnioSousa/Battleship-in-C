@@ -39,6 +39,8 @@ int fd;
 /* Last point shot*/
 Point last;
 
+struct timespec req;
+
 /* É preciso ter cuidado ao sair do programa. Caso seja passado
    GIGINT, O programa sai, mas não chega a fechar o Pipe. Esta
    função combate esse problema.*/
@@ -58,6 +60,13 @@ void pipeManagement();
 /* Função cria espaço dinamicamente para um buffer intermedio que
    iremos usar antes de escrever em cada ficheiro.*/
 void bufferManagement();
+
+/* Função é responsabel por iniciar uma estrutura que sera
+   utilizada em nanosleep(). Basicamente esta estrutura
+   é fundamental para a sincronização dos reads and writes.
+   Caso haja algum problema de sincronização, aumentar
+   o tempo de "sleep", incrementando req.tv_nsec*/
+void sleepManagement();
 
 /* Função le uma linha do ficheiro file e mete num buffer. Esta
    função não le alem do tamanho maximo do buffer*/
