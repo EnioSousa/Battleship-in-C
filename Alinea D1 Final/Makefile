@@ -16,6 +16,8 @@ OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
+all: main client server
+
 main: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
@@ -27,3 +29,6 @@ server: $(OBJ)
 
 clean:
 	rm $(ODIR)/*.o
+	rm ./server
+	rm ./client
+	rm ./main
