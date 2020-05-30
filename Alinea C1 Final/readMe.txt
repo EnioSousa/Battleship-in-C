@@ -21,5 +21,5 @@ $./main 1
 Note: If you initiate player 1 first, then it shall be the first to play
 otherwise player 2 will be the first.
 
-Note: The first player to give a valid map size shall define for the
-define for the other player as well
+Note: The first player to give a valid map size shall define for 
+the other player as well
