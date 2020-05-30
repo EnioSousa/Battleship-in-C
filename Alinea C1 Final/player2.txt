@@ -1,5 +1,1 @@
-10
-disparo
-4
-4
-stdin
+20

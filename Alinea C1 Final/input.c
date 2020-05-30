@@ -137,7 +137,7 @@ int getMapSize()
 
       size = stringIsNumber(buffer) ? atoi(buffer): 0;
 
-      size = size >= 10 && size <= 40 ? size: 0;
+      size = size >= 20 && size <= 40 ? size: 0;
     }
 
   return size;
