@@ -15,57 +15,70 @@ void insertManual(Map *m)
     errorMessageMap("insertManual");
 
   while (someShipLeft(m->ship))
-  {
-    checkId = 1, checkDir = 1;
-    clearTerminal();
-    printf(ANSI_COLOR_YELLOW "Manual\n\n" ANSI_COLOR_RESET);
-    informationShipRemaining(m->ship);
-    printMap(m);
-    printf(ANSI_COLOR_GREEN "Ship identification\n");
-    while (checkId)
     {
-      id = inputCheck();
-      if (id >= 0 && id < 5)
-      {
-        if (m->ship[id].left != 0)
-          checkId = 0;
-        else
-          printf("There are no more ships \n");
-      }
+      checkId = 1, checkDir = 1;
+
+      clearTerminal();
+      printf(ANSI_COLOR_YELLOW "Manual\n\n" ANSI_COLOR_RESET);
+
+      informationShipRemaining(m->ship);
+
+      printMap(m);
+
+      printf(ANSI_COLOR_GREEN "Ship identification\n");
+
+      while (checkId)
+	{
+	  id = inputCheckInt(STDIN_FILENO, "\0");
+
+	  if (id >= 0 && id < 5)
+	    {
+	      if (m->ship[id].left != 0)
+		checkId = 0;
+
+	      else
+		printf("There are no more ships \n");
+	    }
+
+	  else
+	    printf("invalid id\n");
+	}
+
+      x = inputCheckInt(STDIN_FILENO, "X coordinate\n");
+
+      y = inputCheckInt(STDIN_FILENO, "Y coordinate\n");
+
+      if (id == 4)
+	dir = 'n';
+
       else
-        printf("invalid id\n");
+	{
+	  printf("The direction of the ship\n");
+	  directionHelpPrint();
+
+	  while (checkDir)
+	    {
+	      dir = inputCheckChar(STDIN_FILENO, "\0");
+
+	      if (dir == 'n' || dir == 'e' || dir == 'w' || dir == 's')
+		checkDir = 0;
+	      else
+		printf("invalid direction\n" ANSI_COLOR_RESET);
+	    }
+	}
+
+      p.x = x;
+      p.y = y;
+
+      if (placeIsPossible(m, &m->ship[id], &p, dir))
+	insertShip(m, &m->ship[id], &p, dir);
+
+      else
+	{
+	  printf("\nCannot place the ship\n");
+	  waitS(1);
+	}
     }
-    printf("X coordinate\n");
-    x = inputCheck();
-    printf("Y coordinate\n");
-    y = inputCheck();
-    if (id == 4)
-      dir = 'n';
-    else
-    {
-      printf("The direction of the ship\n");
-      directionHelpPrint();
-      while (checkDir)
-      {
-        dir = inputCheckChar();
-        if (dir == 'n' || dir == 'e' || dir == 'w' || dir == 's')
-          checkDir = 0;
-        else
-          printf("invalid direction\n" ANSI_COLOR_RESET);
-      }
-    }
-    p.x = x;
-    p.y = y;
-    if (placeIsPossible(m, &m->ship[id], &p, dir))
-    {
-      insertShip(m, &m->ship[id], &p, dir);
-    }
-    else
-    {
-      printf("\nCannot place the ship\n");
-      waitS(1);
-    }
-  }
 }
 
 /*----------------------Insert Random-----------------------*/

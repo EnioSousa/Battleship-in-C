@@ -1,20 +1,26 @@
 #include "engine.h"
-#include "input.h"
-#include "interface.h"
-
 
 int main(int argc, char **argv)
 {
+  if ( argc<2 && !stringIsNumber(argv[1]) )
+    reportAndExit("Wrong arguments in main. main\n");
+
   signal(SIGINT, handle_sigint);
-
-  pipeManagement();
-
-  bufferManagement();
 
   sleepManagement();
 
-  int size = atoi(argv[2]);
+  bufferManagement();
+
   menuStar();
+
+  /* PipeManagement tambem retorna o tamanho do mapa a ser utilizado*/
+  int size = pipeManagement(atoi(argv[1]), getMapSize());
+
+  /* Existe a possibilidade de ambos os jogadores entrarem
+     ao mesmo tempo e ambos ficarem com a mesma semente
+     dai a ter um bias para cada jogador*/
+  srand(time(NULL) + (atoi(argv[1])==1 ? 123: 789) );
+
   Player *p = initiate(size);
 
   start(p, atoi(argv[1]));
@@ -27,23 +33,22 @@ int main(int argc, char **argv)
 
 void handle_sigint(int sig)
 {
-  printf("Caught signal %d. Stop and unlink has been done\n", sig);
+  printf("Caught signal %d. Safe Exit done\n", sig);
+
   unlink(FIFO_FILE);
   close(fd);
+
   exit(EXIT_SUCCESS);
 }
 
-
 /* Basicamente o primeiro a criar o FIFO_FILE tambem
-   sera responsavel por escrever stdin. Na nossa
-   estrutura quem le stdin, ira ler do std input.
-   Com esta estrutura ambos os player 1 e 2 podem
-   ser os primeiros a jogar, ira depender de quem
-   criar o FIFO_FILE Primeiro.*/
-void pipeManagement()
+   sera responsavel por sincronizar o tamanho do mapa
+   entre os jogadores e tambem será o primeiro a jogar*/
+int pipeManagement(int p, int size)
 {
   int initiateFifo = 0;
 
+  /* Cria o fifo*/
   if ( mkfifo(FIFO_FILE, S_IFIFO | 0666) >= 0 )
     initiateFifo = 1;
 
@@ -52,12 +57,75 @@ void pipeManagement()
   if ( fd < 0 )
     reportAndExit("Error on opening fifo. pipeManagement()\n");
 
+  /* Se este foi o programa que criou o fifo então executa
+     agreedMapSize, que sincroniza o tamanho dos mapas*/
   if ( initiateFifo )
+    return agreedMapSize(p, size);
+
+  /* Caso contrario, tudo o que este processo tem que fazer é ler
+     o tamanho do mapa que o outro jogador decidiu*/
+  else
     {
       flock(fd, LOCK_EX);
-      write(fd, "stdin\n", 6);
+
+      myReadLine(fd);
+
+      if ( !stringIsNumber(buffer) )
+	reportAndExit("Error on reading map size. pipeManagement()\n");
+
+      write(fd, "play\nstdin\n", 11);
+
       flock(fd, LOCK_UN);
+
+      /* Espera pelo o outro processo apanhar a chave exclusiva*/
+      if ( nanosleep(&req, NULL) < 0 )
+	reportAndExit("nanosleep failed. state4\n");
+
+      return atoi(buffer);
     }
+}
+
+/* Basicamente, é este o processo que define o tamanho do mapa
+   e agora vamos esperar que o outro processo veja a nossa mensagem.*/
+int agreedMapSize(int p, int size)
+{
+  flock(fd, LOCK_EX);
+
+  snprintf(buffer, BUFFERSIZE, "%d\n", size);
+
+  write(fd, buffer, strlen(buffer));
+
+  flock(fd, LOCK_UN);
+
+  int cnd = 1;
+
+  while ( cnd )
+    {
+      if ( nanosleep(&req, NULL) < 0 )
+	reportAndExit("nanosleep failed. state4\n");
+
+      flock(fd, LOCK_EX);
+
+      myReadLine(fd);
+
+      if ( strcmp(buffer, "play") != 0 )
+	{
+	  snprintf(buffer, BUFFERSIZE, "%d\n", size);
+
+	  write(fd, buffer, strlen(buffer));
+
+	  flock(fd, LOCK_UN);
+	}
+
+      /* Se chegar aqui, significa que o outro jogador
+	 recebeu o tamanho do mapa, portanto poemos
+	 sair do ciclo, MAS mantemos o lock do file,
+	 para podermos ser os primeiros a jogar*/
+      else
+	cnd = 0;
+    }
+
+  return size;
 }
 
 void sleepManagement()
@@ -74,65 +142,26 @@ void reportAndExit(char *str)
   exit(EXIT_FAILURE);
 }
 
-int stringIsNumber(char *str)
-{
-  for( int i=0; str[i]!='\0'; i++ )
-    if ( !isdigit(str[i]) )
-      return 0;
-
-  return 1;
-}
-
-void bufferManagement()
-{
-  buffer = (char *)calloc(BUFFERSIZE, sizeof(char));
-
-  if ( buffer == NULL )
-    reportAndExit("Memory alocation failed. main\n");
-}
-
-char *myReadLine(int file)
-{
-  int i=0, byteRead;
-
-  do
-    {
-      byteRead = read(file, &buffer[i], 1);
-
-      if ( byteRead < 0 )
-	reportAndExit("Read failed. myReadLine()\n");
-
-      if ( buffer[0]=='\n' )
-	continue;
-
-      i++;
-
-    }while( byteRead > 0 && i<BUFFERSIZE-1 && buffer[i-1]!='\n' && buffer[i-1]!='\0');
-
-  if ( i==0 )
-    reportAndExit("Someting wrong with myReadLine. myReadLine\n");
-
-  buffer[i-1] = '\0';
-
-  return buffer;
-}
-
-/* Altera esta função joão. Podes tambem alterar o tipo de retorno*/
+/**/
 Player *initiate(int size)
 {
   char *name = getName();
-  srand(time(NULL));
+
   Ship *s = initiateShip(size);
   inicGame(name, 0);
   waitS(0);
+
   printAllShip(s);
   waitS(0);
+
   Map *map = newMap(size, s);
   Player *p = initiatePlayer(name, map);
-  printf(ANSI_COLOR_GREEN "If you want to insert Manual press y, if you want Random press any key\n" ANSI_COLOR_RESET);
-  char ch = getchar();
-  getchar();
-  if (ch == 'y')
+
+  printf(ANSI_COLOR_GREEN "Press y for Manual, any key for Random.\n" ANSI_COLOR_RESET);
+
+  myReadLine(STDIN_FILENO);
+
+  if ( buffer[0] == 'y' || buffer[0] == 'Y' )
     insertManual(p->map);
 
   else
@@ -201,19 +230,22 @@ void state2(Player *p)
     return stateLose(p);
 
   while (cycle)
-  {
-    cycle = 0;
-    printf("Where to shoot?\n");
-    printf("X coordinate\n");
-    last.x = inputCheck();
-    printf("Y coordinate\n");
-    last.y = inputCheck();
-    if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
     {
-      printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
-      cycle = 1;
+      cycle = 0;
+
+      printf("Where to shoot?\n");
+
+      last.x = inputCheckInt(STDIN_FILENO, "X coordinate\n");
+
+      last.y = inputCheckInt(STDIN_FILENO, "Y coordinate\n");
+
+
+      if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
+	{
+	  printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
+	  cycle = 1;
+	}
     }
-  }
 
   clearTerminal();
   state3(p, last);

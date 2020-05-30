@@ -26,11 +26,8 @@
 #include <sys/file.h>
 #include <signal.h>
 
-/* BUFFERSIZE -> Tamanho maximo do buffer.
-   buffer -> Uma string que vai ser usada como "buffer" temporario
-   antes de escrevermos nos files*/
-#define BUFFERSIZE 1024
-char *buffer;
+#include "input.h"
+#include "interface.h"
 
 /* fd -> Descritor do ficheiro aberto pelo programa. */
 #define FIFO_FILE "/tmp/myfifo"
@@ -51,15 +48,19 @@ void handle_sigint(int sig);
    ela so serve para o programador saber onde esta a falhar.*/
 void reportAndExit(char *str);
 
-/* Retorna 1 caso a string seja um numero, 0 caso contrario*/
-int stringIsNumber(char *str);
+/* Gere a criação dos named pipes e a sincronização do
+   tamanho dos mapas chamando a função agrredMapSize().
+   Esta função ira retornar o tamanho do mapa acordado.
+   p -> player 1 ou 2
+   Size -> o tamanho que o jogador propos*/
+int pipeManagement(int p, int size);
 
-/* Gere a criação dos named pipes*/
-void pipeManagement();
-
-/* Função cria espaço dinamicamente para um buffer intermedio que
-   iremos usar antes de escrever em cada ficheiro.*/
-void bufferManagement();
+/* Esta função é responsavel por sincronizar o tamanho dos
+   mapas entre os jogadores. Basicamente o primeiro
+   jogador a criar a estrutura de pipes sera aquele
+   que define o tamanho. Tambem é ele que jogara em
+   primeiro lugar.*/
+int agreedMapSize(int p, int size);
 
 /* Função é responsabel por iniciar uma estrutura que sera
    utilizada em nanosleep(). Basicamente esta estrutura
@@ -68,11 +69,6 @@ void bufferManagement();
    o tempo de "sleep", incrementando req.tv_nsec*/
 void sleepManagement();
 
-/* Função le uma linha do ficheiro file e mete num buffer. Esta
-   função não le alem do tamanho maximo do buffer*/
-char *myReadLine(int file);
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* Altera esta função joão. Podes tambem alterar o tipo de retorno
    Altera de modo a receberes apenas o nome do jogador e ver se o gajo
    quer manual ou random*/

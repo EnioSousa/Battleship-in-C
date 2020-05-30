@@ -1,102 +1,154 @@
 #include "input.h"
-#include <stdlib.h>
-#include "errorMessage.h"
-#include "interface.h"
-#include <ctype.h>
-#include <string.h>
-#include <stdio.h>
 
-/*-----------------------Numbers input--------------------------------*/
+/* Funções do enio*/
 
-int inputCheck()
+/**/
+void bufferManagement()
 {
-    char x[10];
-    int i = 1, v, a = 0;
+  buffer = (char *)calloc(BUFFERSIZE, sizeof(char));
 
-    while (i)
-    {
-        if (fgets(x, 10, stdin))
-        {
-            if (NULL == strchr(x, '\n'))
-                eat_Extra();
-        }
-
-        for (int j = 0; j < strlen(x) - 1; j++)
-            if (!isdigit(x[j]))
-            {
-                printf("Entered input is not a number\n");
-                a++;
-                break;
-            }
-
-        if (a == 0)
-            i = 0;
-        else
-            a = 0;
-    }
-    v = atoi(x);
-    return v;
+  if ( buffer == NULL )
+    reportAndExit("Memory alocation failed. main\n");
 }
 
-/*-----------------------Char input--------------------------------*/
-
-char inputCheckChar(int r)
+/**/
+char *myReadLine(int file)
 {
-    int i = 1;
-    char x[10];
-    while (i)
-    {
-        if (fgets(x, 10, stdin))
-        {
-            if (NULL == strchr(x, '\n'))
-                eat_Extra();
-        }
-        if (strlen(x) == 2)
-            i = 0;
-        else
-            printf("Please see game information\n");
-    }
-    return x[0];
+  int i = 0, byteRead;
+
+  do
+  {
+    byteRead = read(file, &buffer[i], 1);
+
+    if ( byteRead < 0 )
+      reportAndExit("Read failed. myReadLine()\n");
+
+    if ( buffer[0] == '\n'|| buffer[0] == '\0' )
+      i--;
+
+    i++;
+
+  } while ( readContinue(buffer, BUFFERSIZE, i) );
+
+  return terminateString(file, buffer, i);
 }
 
-/*-----------------------Name user input--------------------------------*/
+/**/
+int readContinue(char *str, int size, int ind)
+{
+  if ( ind==0 && ind<size )
+    return 1;
+
+  if ( str[0]=='\n' || str[0]=='\0' || str[0]==EOF )
+    return 1;
+
+  if ( buffer[ind-1]!='\n' && buffer[ind-1]!='\0' && buffer[ind-1]!=EOF )
+    return 1;
+
+  return 0;
+}
+
+/**/
+char *terminateString(int file, char *str, int ind)
+{
+  if ( ind==0 )
+    reportAndExit("Error, invalid index. TerminateString()\n");
+
+  /* Significa que o utilizador deu uma linha que não cabe
+     no nosso buffer, i.e esta a haver um buffer
+     overflow atack. Resolvemos ao ignorar o resto.*/
+  if ( str[ind-1]!='\n' && str[ind-1]!='\0' && str[ind-1]!=EOF )
+    for( char lixo; read(file, &lixo, 1) > 0 && lixo != '\n'; );
+
+  str[ind-1] = '\0';
+
+  return str;
+}
+
+/**/
 char *getName()
 {
-    char *str = (char *)malloc(maxNameSize * sizeof(char));
-    if (str == NULL)
-    {
-        errorMessageMem("name player");
-        return NULL;
-    }
-    printf(ANSI_COLOR_RED "Your name please \n" ANSI_COLOR_RESET);
-    if (fgets(str, maxNameSize, stdin))
-    {
-        if (NULL == strchr(str, '\n'))
-            eat_Extra();
-    }
-    return strdup(str);
+  printf(ANSI_COLOR_RED "Your name please \n" ANSI_COLOR_RESET);
+
+  myReadLine(STDIN_FILENO);
+
+  char *temp = (char *)calloc(strlen(buffer)+1, sizeof(char));
+
+  if ( temp==NULL )
+    reportAndExit("Failed to alocate memory. enioGetName()\n");
+
+  return strncpy(temp, buffer, strlen(buffer)+1);
 }
 
-/*-----------------------Auxiliary functions------------------------- */
-
-void eat_Extra(void)
+/**/
+int inputCheckInt(int file, char *str)
 {
+  int cnd = 1;
 
-    int c;
-    while ((c = getchar()) != '\n')
+  while ( cnd )
     {
-        if (c < 0)
-            exit(EXIT_FAILURE);
+      if ( str[0] != '\0' )
+	printf("%s", str);
+
+      myReadLine(file);
+
+      if ( !stringIsNumber(buffer) )
+	printf("Entered input is not a number\n");
+
+      else
+	cnd = 0;
     }
+
+  return atoi(buffer);
 }
 
-/*-----------------------flush in -----------------------*/
-
-void flush_in()
+/**/
+char inputCheckChar(int file, char *str)
 {
+  int cnd = 1;
 
-    int c;
-    while ((c = fgetc(stdin)) != EOF && c != '\n')
+  while ( cnd )
     {
+      if ( str[0] != '\0' )
+	printf("%s", str);
+
+      myReadLine(file);
+
+      if ( !isalpha(buffer[0]) || strlen(buffer) != 1 )
+	printf("Entered input is not a char\n");
+
+      else
+	cnd = 0;
     }
+
+  return buffer[0];
+}
+
+/**/
+int getMapSize()
+{
+  int size = 0;
+
+  while ( !size )
+    {
+      printf("Enter map size. Size should be between 20 and 40.\n");
+
+      myReadLine(STDIN_FILENO);
+
+      size = stringIsNumber(buffer)!=0 ? atoi(buffer): 0;
+
+      size = size >= 20 && size <= 40 ? size: 0;
+    }
+
+  return size;
+}
+
+/**/
+int stringIsNumber(char *str)
+{
+  for (int i = 0; str[i] != '\0'; i++)
+    if (!isdigit(str[i]))
+      return 0;
+
+  return 1;
 }
