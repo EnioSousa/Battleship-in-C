@@ -20,10 +20,13 @@
 #include "ship.h"
 #include "interface.h"
 #include "insert.h"
-#include "player.h"
 
+#include "player.h"
 #include <time.h>
 #include <signal.h>
+
+#include "input.h"
+#include "interface.h"
 
 /* Estrutura usada para iniciar o semaforo
    val -> Usado apenas por SETVAL
@@ -44,12 +47,6 @@ union semun {
    him -> Representa o semaforo que o outro processo vai "usar"*/
 #define SEMKEY 69
 int semaid, you, him;
-
-/* BUFFERSIZE -> Tamanho maximo do buffer.
-   buffer -> Uma string que vai ser usada como "buffer" temporario
-   antes de escrevermos nos files*/
-#define BUFFERSIZE 1024
-char *buffer;
 
 /* fd -> Descritor dos ficheiros aberto pelo programa.
    rd -> Possição em fd[], onde podemos apenas ler
@@ -79,24 +76,15 @@ void reportAndExit(char *str);
    em player1.txt e leia em player.2txt*/
 void fileManagement(int argc, char **argv);
 
-/* Retorna 1 caso a string seja um numero, 0 caso contrario*/
-int stringIsNumber(char *str);
+/* Ambos os jogadores introduzem um tamanho para o mapa,
+   mas apenas um, aquele que entrar primeiro ira
+   definir o tamanho.*/
+int agreedMapSize();
 
 /* Nesta função é criada toda a mecada de semaforos*/
-void semaphoreManagement(int argc, char **argv);
+void semaphoreManagement(char **argv, int mapSize);
 
-/* Função cria espaço dinamicamente para um buffer intermedio que
-   iremos usar antes de escrever em cada ficheiro.*/
-void bufferManagement();
-
-/* Função le uma linha do ficheiro file e mete num buffer. Esta
-   função não le alem do tamanho maximo do buffer*/
-char *myReadLine(int file);
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
-/* Altera esta função joão. Podes tambem alterar o tipo de retorno
-   Altera de modo a receberes apenas o nome do jogador e ver se o gajo
-   quer manual ou random*/
+/* Inicia o jogador */
 Player *initiate(int size);
 
 /* Funções stateX por favor ver o automato em anexo. Basicamente

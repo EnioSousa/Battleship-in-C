@@ -1,6 +1,4 @@
 #include "engine.h"
-#include "input.h"
-#include "interface.h"
 
 int main(int argc, char **argv)
 {
@@ -8,13 +6,18 @@ int main(int argc, char **argv)
 
   fileManagement(argc, argv);
 
-  semaphoreManagement(argc, argv);
-
   bufferManagement();
 
-  int size = atoi(argv[2]);
-  //menuStar();
-  Player *p = initiate(size);
+  menuStar();
+
+  semaphoreManagement(argv, getMapSize());
+
+  /* Existe a possibilidade de ambos os jogadores entrarem
+     ao mesmo tempo e ambos ficarem com a mesma semente
+     dai a ter um bias para cada jogador*/
+  srand(time(NULL) + (atoi(argv[1])==1 ? 123: 789) );
+
+  Player *p = initiate(agreedMapSize());
 
   start(p, atoi(argv[1]));
 
@@ -25,26 +28,32 @@ int main(int argc, char **argv)
   return 0;
 }
 
+/**/
 void handler_sigint(int sig)
 {
-  printf("Caught signal %d. Stop and unlink has been done\n", sig);
+  printf("Caught signal %d. Left safely.\n", sig);
+
   semctl(semaid, 0, IPC_RMID, 0);
+
   exit(EXIT_SUCCESS);
 }
-
+/**/
 void reportAndExit(char *str)
 {
-  fprintf(stderr, "%s\n", str);
+  printf("\n%s\nLeft safely.", str);
+
   semctl(semaid, 0, IPC_RMID, 0);
+
   exit(EXIT_FAILURE);
 }
 
+/**/
 void fileManagement(int argc, char **argv)
 {
-  if (argc != 3 || (!stringIsNumber(argv[1]) && !stringIsNumber(argv[2])))
-    reportAndExit("Passing wrong arguments to main  \n");
+  if ( argc != 2 || !stringIsNumber(argv[1]) )
+    reportAndExit("Passing wrong arguments to main. fileManagement()\n");
 
-  /* Definir onde ler e onde escrever*/
+  /* Definir onde ler e onde escrever.*/
   rd = atoi(argv[1]) == 1 ? 0 : 1;
   wr = rd == 0 ? 1 : 0;
 
@@ -71,28 +80,22 @@ void fileManagement(int argc, char **argv)
     reportAndExit("Something wrong with argv[1]. main\n");
 }
 
-int stringIsNumber(char *str)
+/**/
+void semaphoreManagement(char **argv, int mapSize)
 {
-  for (int i = 0; str[i] != '\0'; i++)
-    if (!isdigit(str[i]))
-      return 0;
-
-  return 1;
-}
-
-void semaphoreManagement(int argc, char **argv)
-{
-  /* create semaphore */
+  /* Criar semaforo */
   semaid = semget(SEMKEY, 2, IPC_CREAT | 0600);
 
   if (semaid < 0)
     reportAndExit("Failed to get semaphore\n");
 
-  /* definir que player fica com que semaforo */
-  if (argc != 3 || !stringIsNumber(argv[1]))
+  /* Definir que player fica com que semaforo */
+  if ( !stringIsNumber(argv[1]) )
     reportAndExit("Passing wrong arguments to main\n");
 
-  you = atoi(argv[1]) == 1 ? 0 : 1;
+  int tp = atoi(argv[1]);
+
+  you = tp == 1 ? 0 : 1;
   him = you == 0 ? 1 : 0;
 
   /* Iniciar o semaforo */
@@ -100,7 +103,7 @@ void semaphoreManagement(int argc, char **argv)
   ushort arr[2];
 
   /* Ambos os jogadores vão querer jogar primeiro*/
-  if ( atoi(argv[1])==1 )
+  if ( tp == 1 )
     {
       arr[0] = 1;
       arr[1] = 0;
@@ -113,17 +116,15 @@ void semaphoreManagement(int argc, char **argv)
 
   arg.array = arr;
 
-  //printf("%d\n", semctl(semaid, 0, GETPID));
-  //printf("%d\n", getpid());
-
-  /* Basicamente estamos a ver se foi este o processo que
-     criou o semaforo. Caso afirmativo, iniciamos.
-     Fazemos isto para não haver "corrupção" dos valores
-     inicias do semafro e para ver quem joga primeiro*/
-  int lastChange = semctl(semaid, 0, GETPID);
-
-  /* lastChange == 0 -> Kernel*/
-  if ( lastChange == 0 )
+  /* Nesta condição iremos ver quem foi o ultimo
+     a mexer no semaro com key SEMKEY.
+     Caso o pid seja diferente de 0 então sabemos
+     que algum processo criou e inicou o semaforo,
+     portanto este processo não pode mexer neste
+     semaforo. Fazemos isto para não haver
+     corrupção dos valores iniciais e para ver
+     quem joga primeiro*/
+  if ( semctl(semaid, 0, GETPID) == 0 )
     {
       if (semctl(semaid, 0, SETALL, arg) < 0)
 	reportAndExit("Set semaphore error. main\n");
@@ -132,16 +133,30 @@ void semaphoreManagement(int argc, char **argv)
       fclose(fopen("player1.txt", "w"));
       fclose(fopen("player2.txt", "w"));
 
-      int temp = open(atoi(argv[1])==1 ? "player1.txt": "player2.txt", O_WRONLY | O_CREAT, 0666);
+      /* Temos que escrever o tamanho do mapa e quem
+	 inicia o jogo nos ficheiros correpondentes
+	 onde os programas iram ler.*/
+      int tFirst = open(tp==1 ? "player1.txt": "player2.txt", O_WRONLY | O_CREAT, 0666);
+      int tSecond = open(tp==1 ? "player2.txt": "player1.txt", O_WRONLY | O_CREAT, 0666);
 
-      write(temp, "stdin\n", 6);
+      if ( snprintf(buffer, BUFFERSIZE, "%2d\nstdin\n", mapSize) <= 0 )
+	reportAndExit("Failed to snprintf. pipemanagement()\n");
 
-      close(temp);
+      if ( write(tFirst, buffer, strlen(buffer)) <= 0)
+	reportAndExit("Failed to write in tempFd. pipeManagement()\n");
+
+      if ( snprintf(buffer, BUFFERSIZE, "%2d\n", mapSize) <= 0 )
+	reportAndExit("Failed to snprintf. pipemanagement()\n");
+
+      if ( write(tSecond, buffer, strlen(buffer)) <= 0)
+	reportAndExit("Failed to write in tempFd. pipeManagement()\n");
+
+      close(tFirst);
+      close(tSecond);
     }
-  /* É preciso de sinconizar o cursor. Basicamente é um porcaria
-     e uma dor de cabeça tentar sincronizar processos.*/
-  else
-    write(fd[wr], "stdin\n", 6);
+
+  /* Meter o cursor de escrever no lugar direito*/
+  lseek(fd[wr], 0, SEEK_END);
 
   /* Definir como mudar de jogador e quando é que se pode jogar*/
   for (int i = 0; i < 2; i++)
@@ -160,63 +175,40 @@ void semaphoreManagement(int argc, char **argv)
   changePlayer[him].sem_op = 1;
 }
 
-void bufferManagement()
+/**/
+int agreedMapSize()
 {
-  buffer = (char *)calloc(BUFFERSIZE, sizeof(char));
+  if ( !stringIsNumber(myReadLine(fd[rd])) )
+    reportAndExit("Failed to print the map size on the file. agreedMapSize()\n");
 
-  if (buffer == NULL)
-    reportAndExit("Memory alocation failed. main\n");
+  return atoi(buffer);
 }
 
-char *myReadLine(int file)
-{
-  int i = 0, byteRead;
-
-  do
-  {
-    byteRead = read(file, &buffer[i], 1);
-
-    if (byteRead < 0)
-      reportAndExit("Read failed. myReadLine()\n");
-
-    if (buffer[0] == '\n'|| buffer[0] == '\0' )
-      continue;
-
-    i++;
-
-  } while (byteRead > 0 && i < BUFFERSIZE - 1 && buffer[i - 1] != '\n' && buffer[i - 1] != '\0');
-
-  if (i == 0)
-    reportAndExit("Someting wrong with myReadLine. myReadLine\n");
-
-  buffer[i - 1] = '\0';
-
-  return buffer;
-}
-
-/* Altera esta função joão. Podes tambem alterar o tipo de retorno*/
+/**/
 Player *initiate(int size)
 {
   char *name = getName();
-  srand(time(NULL));
+
   Ship *s = initiateShip(size);
   inicGame(name, 0);
   waitS(0);
+
   printAllShip(s);
   waitS(0);
+
   Map *map = newMap(size, s);
   Player *p = initiatePlayer(name, map);
-  printf(ANSI_COLOR_GREEN "If you want to insert Manual press y, if you want Random press any key\n" ANSI_COLOR_RESET);
-  char ch = getchar();
-  getchar();
-  if (ch == 'y')
-    {
-      insertManual(p->map);
-    }
+
+  printf(ANSI_COLOR_GREEN "Press y for Manual, any key for Random.\n" ANSI_COLOR_RESET);
+
+  myReadLine(STDIN_FILENO);
+
+  if ( buffer[0] == 'y' || buffer[0] == 'Y' )
+    insertManual(p->map);
+
   else
-    {
-      insertRandom(p->map);
-    }
+    insertRandom(p->map);
+
   clearTerminal();
   display(p->map);
 
@@ -225,7 +217,7 @@ Player *initiate(int size)
 
 void start(Player *p, int nPlayer)
 {
-  if (nPlayer != 1 && nPlayer != 2)
+  if ( nPlayer != 1 && nPlayer != 2 )
     reportAndExit("Player has to be 1 or 2. start()\n");
 
   state0(p);
@@ -238,13 +230,13 @@ void state0(Player *p)
   /* Test if you can play*/
   semop(semaid, youPlay, 2);
 
+  /* Onwards its critical*/
   if (p->map->won)
     return stateWin(p);
 
   else if (p->map->lost)
     return stateLose(p);
 
-  /* Onwards its critical*/
   myReadLine(fd[rd]);
 
   state1(p);
@@ -263,36 +255,37 @@ void state1(Player *p)
 
   else
   {
-    printf("%s===", buffer);
+    printf(">>>>>>%s<<<<<<", buffer);
     reportAndExit("Unknown type. state1()\n");
   }
 }
 
-/* Altera esta função para o programa não ler merda do utilizador.
-   É importante isto tar a funcionar corretamente men!!!*/
 void state2(Player *p)
 {
   int cycle = 1;
+
   if (p->map->won)
     return stateWin(p);
 
   else if (p->map->lost)
     return stateLose(p);
 
-  while (cycle)
+  while ( cycle )
     {
       cycle = 0;
       printf("Where to shoot?\n");
-      printf("X coordinate\n");
-      last.x = inputCheck();
-      printf("Y coordinate\n");
-      last.y = inputCheck();
+
+      last.x = inputCheckInt(STDIN_FILENO, "X coordinate\n");
+
+      last.y = inputCheckInt(STDIN_FILENO, "Y coordinate\n");
+
       if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
 	{
 	  printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
 	  cycle = 1;
 	}
     }
+
   clearTerminal();
   state3(p, last);
 }
@@ -335,6 +328,7 @@ void state6(Player *p)
 {
   updateHistory(p->map, &last, 1);
 
+  clearTerminal();
   display(p->map);
 
   state2(p);
@@ -344,6 +338,7 @@ void state7(Player *p)
 {
   updateHistory(p->map, &last, 0);
 
+  clearTerminal();
   display(p->map);
 
   state8(p);
@@ -389,6 +384,7 @@ void state10(Player *pt, Point p)
 {
   int cnd = shoot(pt->map, &p);
 
+  clearTerminal();
   display(pt->map);
 
   state11(pt, cnd);
@@ -408,6 +404,7 @@ void stateWin(Player *p)
   winMeme();
   printf("You won\n");
   inicGame(p->name, 2);
+
   semop(semaid, changePlayer, 2);
 }
 
@@ -415,5 +412,6 @@ void stateLose(Player *p)
 {
   printf("You lost\n");
   inicGame(p->name, 1);
+
   semop(semaid, changePlayer, 2);
 }

@@ -1,6 +1,5 @@
+10
 disparo
-2
-2
+4
+4
 stdin
-result
-hit

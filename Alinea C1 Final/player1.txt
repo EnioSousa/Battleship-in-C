@@ -1,6 +1,4 @@
+10
 stdin
 result
 fail
-disparo
-2
-2
