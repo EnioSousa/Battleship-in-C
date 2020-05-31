@@ -1,108 +1,112 @@
 #include "engine.h"
-#include "input.h"
 
 int main(int argc, char **argv)
 {
-  int seed = atoi(argv[2])==2 ? time(NULL) + 1250: time(NULL);
-  srand(seed);
+  if ( argc<3 && !stringIsNumber(argv[1]) )
+    reportAndExit("Wrong arguments in main. main\n");
 
   signal(SIGINT, handle_sigint);
 
   bufferManagement();
 
-  fd = atoi(argv[1]);
-  
- 
-  
-  int size = atoi(argv[3]);
+  fd = atoi(argv[1]); // sock id
+
   menuStar();
+
+  int size = agreedMapSize(atoi(argv[2])); // argv[2] -> Player number, 1 or 2
+
+  /* Existe a possibilidade de ambos os jogadores entrarem
+     ao mesmo tempo e ambos ficarem com a mesma semente
+     dai a ter um bias para cada jogador*/
+  srand(time(NULL) + (atoi(argv[2])==1 ? 123: 789) );
+
   Player *p = initiate(size);
-  
+
   start(p, atoi(argv[2]));
+
+  close(fd);
 
   return 0;
 }
 
 void handle_sigint(int sig)
 {
-  printf("Caught signal %d. Stop and unlink has been done\n", sig);
+  printf("Caught signal %d. Safe Exit done\n", sig);
+
   unlink(FIFO_FILE);
   close(fd);
+
   exit(EXIT_SUCCESS);
 }
 
 void reportAndExit(char *str)
 {
   fprintf(stderr, "%s\n", str);
+  close(fd);
   exit(EXIT_FAILURE);
 }
 
-int stringIsNumber(char *str)
+/* Função que sincroniza o tamanho dos mapas*/
+int agreedMapSize(int p)
 {
-  for( int i=0; str[i]!='\0'; i++ )
-    if ( !isdigit(str[i]) )
-      return 0;
+  /* Busca o tamanho do mapa proposto pelo jogador*/
+  int size = getMapSize();
 
-  return 1;
-}
+  /* Guarda o tempo de chegada a esta linha*/
+  time_t timeOfDecision = time(NULL);
 
-void bufferManagement()
-{
-  buffer = (char *)calloc(BUFFERSIZE, sizeof(char));
+  /* Escreve o tempo de decição e o tamanho que o jogador quer*/
+  snprintf(buffer, BUFFERSIZE, "%ld\n%d\n", timeOfDecision, size);
+  write(fd, buffer, strlen(buffer));
 
-  if ( buffer == NULL )
-    reportAndExit("Memory alocation failed. main\n");
-}
+  /* Le o tempo de decição do outro jogador*/
+  if ( !stringIsNumber(myReadLine(fd)) )
+    reportAndExit("Bad sincronization. agreedMapSize()\n");
 
-char *myReadLine(int file)
-{
-  int i=0, byteRead;
+  /* Converte o tempo de decição para um long*/
+  time_t otherTimeOfDecision = atoll(buffer);
 
-  do
+  /* Le o tamanho que o outro jogador propos*/
+  int otherSize = atoi(myReadLine(fd));
+
+  /* Ve quem chegou primeiro e faz decisão baseado nisso*/
+  if ( timeOfDecision < otherTimeOfDecision || ( timeOfDecision == otherTimeOfDecision && p == 1 ) )
+    return size;
+
+  /* O outro jogador é que decidio o tamanho do mapa então
+     vamos dizer a ele para começar a jogar*/
+  else
     {
-      byteRead = read(file, &buffer[i], 1);
-
-      if ( byteRead < 0 )
-	reportAndExit("Read failed. myReadLine()\n");
-
-      if ( buffer[0]=='\n' || buffer[0]=='\0' )
-	continue;
-
-      i++;
-
-    }while( byteRead > 0 && i<BUFFERSIZE-1 && buffer[i-1]!='\n' );
-
-  if ( i==0 )
-    reportAndExit("Someting wrong with myReadLine. myReadLine\n");
-
-  buffer[i-1] = '\0';
-
-  return buffer;
+      write(fd, "stdin\n", 6);
+      return otherSize;
+    }
 }
 
-/* Altera esta função joão. Podes tambem alterar o tipo de retorno*/
-Player* initiate(int size)
+/**/
+Player *initiate(int size)
 {
   char *name = getName();
-  srand(time(NULL));
+
   Ship *s = initiateShip(size);
   inicGame(name, 0);
   waitS(0);
+
   printAllShip(s);
   waitS(0);
+
   Map *map = newMap(size, s);
   Player *p = initiatePlayer(name, map);
-  printf(ANSI_COLOR_GREEN "If you want to insert Manual press y, if you want Random press any key\n" ANSI_COLOR_RESET);
-  char ch = getchar();
-  getchar();
-  if (ch == 'y')
-  {
+
+  printf(ANSI_COLOR_GREEN "Press y for Manual, any key for Random.\n" ANSI_COLOR_RESET);
+
+  myReadLine(STDIN_FILENO);
+
+  if ( buffer[0] == 'y' || buffer[0] == 'Y' )
     insertManual(p->map);
-  }
+
   else
-  {
     insertRandom(p->map);
-  }
+
   clearTerminal();
   display(p->map);
 
@@ -127,12 +131,7 @@ void state0(Player *p)
   else if ( p->map->lost )
     return stateLose(p);
 
-  if ( flock(fd, LOCK_EX) < 0 )
-    reportAndExit("Failed to acquire the lock\n");
-
   myReadLine(fd);
-
-  //printf(">>>>>>>>>>>>>>%s<<<<<<<<<<<<<\n", buffer);
 
   state1(p);
 }
@@ -155,9 +154,12 @@ void state1(Player *p)
     }
 }
 
+/* Altera esta função para o programa não ler merda do utilizador.
+   É importante isto tar a funcionar corretamente men!!!*/
 void state2(Player *p)
 {
   int cycle = 1;
+
   if (p->map->won)
     return stateWin(p);
 
@@ -165,47 +167,41 @@ void state2(Player *p)
     return stateLose(p);
 
   while (cycle)
-  {
-    cycle = 0;
-    printf("Where to shoot?\n");
-    printf("X coordinate\n");
-    last.x = inputCheck();
-    printf("Y coordinate\n");
-    last.y = inputCheck();
-    if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
     {
-      printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
-      cycle = 1;
+      cycle = 0;
+
+      printf("Where to shoot?\n");
+
+      last.x = inputCheckInt(STDIN_FILENO, "X coordinate\n");
+
+      last.y = inputCheckInt(STDIN_FILENO, "Y coordinate\n");
+
+
+      if (last.x > p->map->mapSize || last.y > p->map->mapSize || last.x <= 0 || last.y <= 0)
+	{
+	  printf(ANSI_COLOR_RED "Coordinates goes beyond the battlefield\n\n" ANSI_COLOR_RESET);
+	  cycle = 1;
+	}
     }
-  }
+
   clearTerminal();
   state3(p, last);
-    
-
-  printf("Where to shoot?\n");
-
-  /*Read point. Cetificate que ele não le merda*/
-  scanf("%d %d", &last.x, &last.y);
-
-  state3(p, last);
-  
-  
 }
 
-void state3(Player *pt, Point p)
+void state3(Player *m, Point p)
 {
   snprintf(buffer, BUFFERSIZE, "disparo\n%d\n%d\n", p.x, p.y);
 
   write(fd, buffer, strlen(buffer));
 
-  state4(pt);
+  state4(m);
 }
 
+/* Com sockets a passagem de jogador é bastante facil,
+   decidi manter o state4 para manter o "contexto"
+   que ja vem das alineas C*/
 void state4(Player *p)
 {
-  if ( flock(fd, LOCK_UN) < 0 )
-    reportAndExit("Failed to unlock the lock\n");
-
   state0(p);
 }
 
@@ -284,8 +280,8 @@ void state10(Player *pt, Point p)
 {
   int cnd = shoot(pt->map, &p);
 
-  display(pt->map);
 
+  display(pt->map);
   state11(pt, cnd);
 }
 
@@ -300,13 +296,14 @@ void state11(Player *p, int cnd)
 
 void stateWin(Player *p)
 {
-  winMeme();	
+  winMeme();
   printf("You won\n");
   inicGame(p->name, 2);
 }
 
 void stateLose(Player *p)
 {
-  printf("You lost\n");
+
   inicGame(p->name, 1);
+  printf("You lost\n");
 }

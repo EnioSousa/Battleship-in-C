@@ -1,23 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+
 #include <sys/types.h>
- #include <sys/wait.h>
+#include <sys/wait.h>
 
 #define PORT 6969
-
-#define BUFFERSIZE 1024
-char *buffer;
 
 int sock;
 
 char **fArg;
 
 void reportAndExit(char *str);
-void bufferManagement();
 void sockManagement(char *ip);
 
 void argumentManagement(int argc, char **argv);
@@ -25,10 +23,7 @@ char *newCharArray(int n);
 
 int main(int argc, char **argv)
 {
-  /**/
-  bufferManagement();
-
-  if ( argc != 3 )
+  if ( argc != 2 )
     reportAndExit("argv errado. main\n");
 
   sockManagement(argv[1]);
@@ -48,8 +43,6 @@ int main(int argc, char **argv)
 
   else
     {
-      write(sock, "stdin\n", 6);
-
       if ( execv("./main", fArg) < 0 )
 	reportAndExit("Error on execv. main\n");
     }
@@ -61,14 +54,6 @@ void reportAndExit(char *str)
 {
   fprintf(stderr, "%s", str);
   exit(EXIT_FAILURE);
-}
-
-void bufferManagement()
-{
-  buffer = (char *)calloc(BUFFERSIZE, sizeof(char));
-
-  if ( buffer == NULL )
-    reportAndExit("Memory alocation failed. bufferManagement\n");
 }
 
 void sockManagement(char *ip)
@@ -93,29 +78,22 @@ void sockManagement(char *ip)
   /* Fazer conecção com o server */
   if ( connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0 )
     reportAndExit("connect failed. main\n");
-
-  /* Teste de funcionamento*/
-  strcpy(buffer, "Hello from client\n\0");
-  write(sock, buffer, BUFFERSIZE);
-  read(sock, buffer, BUFFERSIZE);
-  printf("Client: %s\n", buffer);
 }
 
 void argumentManagement(int argc, char **argv)
 {
-  fArg = (char **)calloc(5, sizeof(char *));
+  fArg = (char **)calloc(4, sizeof(char *));
 
   if ( fArg == NULL )
     reportAndExit("Memory alocation failed. argumentManagement\n");
 
-  for( int i=0; i<5; i++ )
+  for( int i=0; i<4; i++ )
     fArg[i] = newCharArray(128);
 
   strcpy(fArg[0], "main");
   snprintf(fArg[1], 127, "%d", sock);
   strcpy(fArg[2], "2");
-  strncpy(fArg[3], argv[2], 127);
-  fArg[4] = NULL;
+  fArg[3] = NULL;
 }
 
 char *newCharArray(int n)

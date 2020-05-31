@@ -7,12 +7,6 @@ ODIR=./bin
 _OBJ = engine.o errorMessage.o point.o ship.o map.o search.o insert.o interface.o mapLinkedList.o delete.o input.o player.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_OBJC = client.o
-OBJC = $(patsubst %,$(ODIR)/%,$(_OBJC))
-
-_OBJS = server.o
-OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
-
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
@@ -21,11 +15,11 @@ all: main client server
 main: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
-client: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+client:
+	$(CC) -o client client.c $(CFLAGS)
 
-server: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+server:
+	$(CC) -o server server.c $(CFLAGS)
 
 clean:
 	rm $(ODIR)/*.o

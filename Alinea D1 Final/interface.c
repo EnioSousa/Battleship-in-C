@@ -165,16 +165,16 @@ void printMap(Map *root)
     cur = searchBit(root, &p);
 
     if (cur == NULL || *cur == '0')
-      printf(ANSI_COLOR_BLUE "0 " ANSI_COLOR_RESET);
+      printf(ANSI_COLOR_BLUE " 0 " ANSI_COLOR_RESET);
 
     else if (*cur == '1')
-      printf(ANSI_COLOR_GREEN "1 " ANSI_COLOR_RESET);
+      printf(ANSI_COLOR_GREEN " 1 " ANSI_COLOR_RESET);
 
     else if (*cur == '2')
-      printf(ANSI_COLOR_RED "2 " ANSI_COLOR_RESET);
+      printf(ANSI_COLOR_RED " 2 " ANSI_COLOR_RESET);
 
     else
-      printf(ANSI_COLOR_YELLOW "3 " ANSI_COLOR_RESET);
+      printf(ANSI_COLOR_YELLOW " 3 " ANSI_COLOR_RESET);
 
     if (i % root->mapSize == 0)
     {
@@ -191,15 +191,12 @@ void printMap(Map *root)
   printf("    ");
 
   for (int i = 0; i < root->mapSize; i++)
-    printf("--");
+    printf("---");
 
-  printf("\n   ");
+  printf("\n    ");
 
-  for (int i = 0; i < root->mapSize; i++)
-    if (i % 2 == 0)
-      printf(ANSI_COLOR_RED "%2d" ANSI_COLOR_RESET, i + 1);
-    else
-      printf(ANSI_COLOR_YELLOW "%2d" ANSI_COLOR_RESET, i + 1);
+  for (int i = 1; i <= root->mapSize; i++)
+    printf("%2d ", i);
 
   printf("\n\n");
 }
@@ -226,13 +223,13 @@ void printHistory(Map *root)
     cur = searchShoot(root, &p);
 
     if (cur == NULL || *cur == '0')
-      printf(ANSI_COLOR_BLUE "0 " ANSI_COLOR_RESET);
+      printf(ANSI_COLOR_BLUE " 0 " ANSI_COLOR_RESET);
 
     else if (*cur == '1')
-      printf(ANSI_COLOR_RED "1 " ANSI_COLOR_RESET);
+      printf(ANSI_COLOR_RED " 1 " ANSI_COLOR_RESET);
 
     else
-      printf(ANSI_COLOR_YELLOW "2 " ANSI_COLOR_RESET);
+      printf(ANSI_COLOR_YELLOW " 2 " ANSI_COLOR_RESET);
 
     if (i % root->mapSize == 0)
     {
@@ -249,17 +246,13 @@ void printHistory(Map *root)
   printf("    ");
 
   for (int i = 0; i < root->mapSize; i++)
-    printf("--");
+    printf("---");
 
-  printf("\n   ");
+  printf("\n    ");
 
-  for (int i = 0; i < root->mapSize; i++)
-  {
-    if (i % 2 == 0)
-      printf(ANSI_COLOR_RED "%2d" ANSI_COLOR_RESET, i + 1);
-    else
-      printf(ANSI_COLOR_YELLOW "%2d" ANSI_COLOR_RESET, i + 1);
-  }
+  for (int i = 1; i <= root->mapSize; i++)
+    printf("%2d ", i);
+
   printf("\n\n");
 }
 

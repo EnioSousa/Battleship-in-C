@@ -4,7 +4,11 @@ $make
 
 How to run:
 In one shell do:
-./server "map size"
+./server
 
 In other shell do:
-./client "ip of server" "map size"
+./client "ip of server" 
+
+Notes: O primeiro jogador a introduzir um tamanho do mapa
+valido sera aquele que definira o tamanho de ambos os jogadores
+e aquele que começa a jogar primeiro

@@ -1,23 +1,22 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/socket.h>
+
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <input.h>
 
 #define PORT 6969
-
-#define BUFFERSIZE 1024
-char *buffer;
 
 int serverFd, newSocket;
 
 char **fArg;
 
 void reportAndExit(char *str);
-void bufferManagement();
 void sockManagement();
 
 void argumentManagement(int argc, char **argv);
@@ -25,8 +24,6 @@ char *newCharArray(int n);
 
 int main(int argc, char **argv)
 {
-  bufferManagement();
-
   sockManagement();
 
   argumentManagement(argc, argv);
@@ -61,14 +58,6 @@ void reportAndExit(char *str)
   exit(EXIT_FAILURE);
 }
 
-void bufferManagement()
-{
-  buffer = (char *)calloc(BUFFERSIZE, sizeof(char));
-
-  if ( buffer == NULL )
-    reportAndExit("Memory alocation failed. bufferManagement\n");
-}
-
 void sockManagement()
 {
   serverFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -101,28 +90,21 @@ void sockManagement()
 
   if ( newSocket < 0 )
     reportAndExit("accept failed. main\n");
-
-  //Teste
-  read(newSocket, buffer, BUFFERSIZE-1);
-  printf("Server: %s\n", buffer);
-  strcpy(buffer, "Hello from server\n");
-  write(newSocket, buffer,strlen(buffer));
 }
 
 void argumentManagement(int argc, char **argv)
 {
-  fArg = (char **)calloc(5, sizeof(char *));
+  fArg = (char **)calloc(4, sizeof(char *));
 
   if ( fArg == NULL )
     reportAndExit("Memory alocation failed. argumentManagement\n");
 
-  for( int i=0; i<5; i++ )
+  for( int i=0; i<4; i++ )
     fArg[i] = newCharArray(128);
 
   strcpy(fArg[0], "main");
   snprintf(fArg[1], 127, "%d", newSocket);
   strcpy(fArg[2], "1");
-  strncpy(fArg[3], argv[1], 127);
   fArg[4] = NULL;
 }
 
