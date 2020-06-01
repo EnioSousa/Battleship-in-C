@@ -13,3 +13,5 @@ Selecionando um dos modos anteriores o jogo inicia. Cada jogador terá duas matr
 O jogador precisa de inserir as coordenadas(x e y) do seu tiro. Caso o seu disparo  atinge um barco poderá disparar novamente. Caso contrário passa a vez para outro jogador.As matrizes serão a actualizadas em cada disparo.
 O primeiro que eliminar todos os barcos vence o jogo.
 No fim do jogo poderá reiniciar uma nova partida.
+
+Este programa está implementado com o quad-tree data structure.
