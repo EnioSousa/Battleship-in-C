@@ -217,8 +217,7 @@ void state1(Player *p)
     }
 }
 
-/* Altera esta função para o programa não ler merda do utilizador.
-   É importante isto tar a funcionar corretamente men!!!*/
+
 void state2(Player *p)
 {
   int cycle = 1;
@@ -271,7 +270,7 @@ void state4(Player *p)
      tens outros processos a espera de executar, caso afirmativo
      ele ira correr o outro processo, e o outro processo
      encontra-se num estado em que esta a espera ou ira pedir uma
-     chave exclusiva. Com este sleep consiguimos uma cominicação
+     chave exclusiva. Com este sleep consiguimos uma comunicação
      sem corrupção */
   if ( nanosleep(&req, NULL) < 0 )
     reportAndExit("nanosleep failed. state4\n");
