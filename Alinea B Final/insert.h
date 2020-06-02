@@ -29,16 +29,16 @@ int findSomeDir(Map *m, Ship *ship, Point *p, char *dir);
 
 /*----------------------------Check-------------------------------*/
 
-/* Retorna 1 caso seja possivel colocar o navio na possição p, com direção dir.
+/* Retorna 1 caso seja possivel colocar o navio na posição p, com direção dir.
    case contrario retorna 0*/
 int placeIsPossible(Map *level, Ship *ship, Point *p, char dir);
 
 /* Retorna 1 caso esteja disponivel a configuração, i.e se nas dadas 
-   possições que o navio tem que ocupar, estãolivre. Caso não seja possivel 
+   posições que o navio tem que ocupar, estão livre. Caso não seja possivel 
    retorna 0*/
 int confAvaliable(Map *m, Ship *ship, Point *ref, char dir);
 
-/* Retorna 1 caso as possições a volta onde o navio ocupara estão vazias. 
+/* Retorna 1 caso as posições a volta onde o navio ocupara estão vazias. 
    Caso contrario retorna 0*/  
 int voidAroundPoint(Map *root, Point *p);
 
