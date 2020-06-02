@@ -198,7 +198,7 @@ void state3(Player *m, Point p)
 }
 
 /* Com sockets a passagem de jogador é bastante facil,
-   decidi manter o state4 para manter o "contexto"
+   decidimos manter o state4 para manter o "contexto"
    que ja vem das alineas C*/
 void state4(Player *p)
 {
