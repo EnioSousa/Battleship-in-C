@@ -12,8 +12,8 @@
 
 /* ship  -> Apontador para o tipo de barco que ocupa a cell
    bit   -> Identificador do estado da celula.
-            1) possição tem um ponto do barco não atingida
-	    2) possição tem um ponto do barco atingida.
+            1) posição tem um ponto do barco não atingida
+	    2) posição tem um ponto do barco atingida.
 	    3) Não tem barco, mas o adversario atirou na celula
    shoot -> Representa a historia de ataques do jogador
             1) O jogador atirou no mapa adversario mas não acertou
