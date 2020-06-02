@@ -20,7 +20,7 @@ void insertManual(Map *m);
 /* Coloca todos os barcos de forma aleatoria. Não esquecer de inciar a semente*/
 void insertRandom(Map *m);
 
-/* Encontra uma possição e direção para colocar um barco*/
+/* Encontra uma posição e direção para colocar um barco*/
 void findSomePlace(Map *m, Ship *ship, Point *p, char *dir);
 
 /* Encontra uma direção no ponto p para colocar o barco*/
@@ -44,9 +44,9 @@ int voidAroundPoint(Map *root, Point *p);
 
 
 /*----------------------Insert Ship-----------------------*/
-/* Insere um tipo de navio  na possição ref com direção dir.
+/* Insere um tipo de navio  na posição ref com direção dir.
    Atenção que esta função não verifica se é possivel colocar o navio nessa
-   possição, esse trabalho tem que ser feito antes.*/
+   posição, esse trabalho tem que ser feito antes.*/
 void insertShip(Map *root, Ship *ship, Point *ref, char dir);
 
 /* Coloca um apontador para ship na possição p.
@@ -58,7 +58,7 @@ void insertPointer(Map *root, Point *p, Ship *ship);
    uma nova celula*/
 void insertShoot(Map *root, Point *p, char shoot);
 
-/* Modifica a variavel bit de cell da possição p. Caso não existe é criado
+/* Modifica a variavel bit de cell da posição p. Caso não existe é criado
    uma nova celula*/
 void insertBit(Map *root, Point *p, char bit);
 
@@ -93,7 +93,7 @@ void randomPoint(Map *m, Point *p);
 /*--------------------------Move Point------------------------------*/
 
 /* Anda com o ponto para a esquerda. Caso saia do mapa ele é realocado 
-   noutra possição*/
+   noutra posição*/
 void movePointLeft(Map *level, Point *p);
 
 /* Anda com um ponto segundo um vertor de deslocação. A nova informação 
