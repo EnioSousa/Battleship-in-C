@@ -34,7 +34,7 @@ typedef struct Ship
 Ship* initiateShip(int nShips);
 
 /* Define a forma de cada tipo de barco usando um vector de deslocação.
-   Caso queiras mudar a forma do barco basta adicionar os pontos que o barco
+   Caso haja a necessidade de  mudar a forma do barco basta adicionar os pontos que o barco
    tem que passar. Atenção que por definição os barcos apontam todos para East. 
    Exemplo: Um barco com forma T e tamanho 5 seria definido da seguinte forma:
    vec[i].p->x = i e vec[i].p->y = 0, para i={0..2}
