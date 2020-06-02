@@ -21,6 +21,6 @@ O primeiro que eliminar todos os barcos vence o jogo.
 Este programa está implementado com o quad-tree data structure.
 
 
-Notes: O primeiro jogador a introduzir um tamanho do mapa
-valido sera aquele que definira o tamanho de ambos os jogadores
-e aquele que começa a jogar primeiro
+Notes: O primeiro jogador a introduzir o tamanho do mapa
+válido será aquele que definirá o tamanho do mapa de ambos os jogadores
+e aquele que começará a jogar primeiro.
