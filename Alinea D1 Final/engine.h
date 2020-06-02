@@ -57,9 +57,7 @@ void reportAndExit(char *str);
    escolhendo o tamanho que o player 1 introduzio*/
 int agreedMapSize(int p);
 
-/* Altera esta função joão. Podes tambem alterar o tipo de retorno
-   Altera de modo a receberes apenas o nome do jogador e ver se o gajo
-   quer manual ou random*/
+/* Retorna o player*/
 Player* initiate(int size);
 
 /* Funções stateX por favor ver o automato em anexo. Basicamente
