@@ -69,9 +69,7 @@ int agreedMapSize(int p, int size);
    o tempo de "sleep", incrementando req.tv_nsec*/
 void sleepManagement();
 
-/* Altera esta função joão. Podes tambem alterar o tipo de retorno
-   Altera de modo a receberes apenas o nome do jogador e ver se o gajo
-   quer manual ou random*/
+/*retorna o Player*/
 Player* initiate(int size);
 
 /* Funções stateX por favor ver o automato em anexo. Basicamente
