@@ -57,7 +57,7 @@ int stringIsNumber(char *str);
 /* Busca o tamanho do map para o utilizador.*/
 int getMapSize();
 
-/* Este include não é engano. É suposto estar aqui =)*/
+
 #include "engine.h"
 
 #endif
